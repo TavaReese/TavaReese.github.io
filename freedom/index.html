@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Two Kinds of Freedom · Tava Reese</title>
+  <meta name="description" content="An interactive walkthrough of a corpus and BERT-embedding study of how British MPs use the word freedom, tested against Isaiah Berlin's Two Concepts of Liberty." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #faf9f6; --panel: #f3f1ea; --text: #1a1a18; --muted: #6b6b60;
+      --accent: #b05c3a; --line: #e2e0d8;
+      --to: #3d6e8c; --from: #b05c3a;
+      --left: #b4473d; --centre: #d1993a; --right: #3b5a85; --other: #9a9a8e;
+      --mono: 'DM Mono', ui-monospace, monospace;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'EB Garamond', Georgia, serif; background: var(--bg); color: var(--text); font-size: 19px; line-height: 1.7; }
+    .container { max-width: 720px; margin: 0 auto; padding: 48px 20px 96px; }
+    .wide { max-width: 920px; margin-left: auto; margin-right: auto; }
+    a { color: var(--accent); }
+    .back { font-family: var(--mono); font-size: 13px; text-decoration: none; }
+    .kicker { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 40px 0 10px; }
+    h1 { font-size: 2.4rem; font-weight: 500; line-height: 1.15; letter-spacing: -.02em; margin-bottom: 14px; }
+    .byline { color: var(--muted); font-style: italic; margin-bottom: 6px; }
+    .meta { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+    .meta a { margin-right: 14px; text-decoration: none; }
+    .lede { font-size: 1.18rem; margin: 28px 0; }
+    em.w { font-style: italic; }
+    .to { color: var(--to); font-weight: 500; } .from { color: var(--from); font-weight: 500; }
+
+    /* TL;DR cards */
+    .tldr { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 24px 0; margin: 32px 0 8px; }
+    .label { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; display: block; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 18px; }
+    .card { background: var(--panel); border-radius: 6px; padding: 14px 14px 12px; }
+    .card .big { font-family: var(--mono); font-size: 1.6rem; line-height: 1.1; color: var(--accent); }
+    .card p { font-size: .9rem; line-height: 1.4; margin-top: 6px; }
+
+    /* sections */
+    section { margin-top: 64px; }
+    h2 { font-size: 1.6rem; font-weight: 500; letter-spacing: -.01em; margin-bottom: 14px; display: flex; gap: 14px; align-items: baseline; }
+    h2 .num { font-family: var(--mono); font-size: .8rem; color: var(--accent); }
+    section p { margin-bottom: 14px; }
+    .note { font-size: .92rem; color: var(--muted); }
+    blockquote { border-left: 2px solid var(--accent); padding: 2px 0 2px 18px; margin: 18px 0; font-style: italic; }
+    figure { margin: 26px 0 30px; }
+    figcaption { font-size: .9rem; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+    figcaption b { color: var(--text); font-weight: 500; }
+    .panel { background: var(--panel); border-radius: 8px; padding: 18px; }
+
+    /* controls */
+    .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--bg); flex-wrap: wrap; }
+    .seg button { font-family: var(--mono); font-size: 12px; border: 0; background: none; padding: 7px 13px; cursor: pointer; color: var(--muted); }
+    .seg button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+    .btn { font-family: var(--mono); font-size: 12.5px; border: 1px solid var(--line); background: var(--bg); color: var(--text); padding: 8px 14px; border-radius: 999px; cursor: pointer; transition: border-color .15s, background .15s; }
+    .btn:hover { border-color: var(--text); }
+    .btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .btn:focus-visible, .seg button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    mark { background: rgba(176,92,58,.16); color: inherit; padding: 0 2px; border-radius: 2px; font-weight: 500; }
+
+    /* 01 game */
+    .game .sent { font-size: 1.2rem; line-height: 1.55; min-height: 5.2em; margin: 12px 0 16px; }
+    .blank { display: inline-block; min-width: 3.4em; border-bottom: 2px solid var(--text); text-align: center; font-weight: 500; transition: color .2s; }
+    .game .choices { display: flex; gap: 10px; flex-wrap: wrap; }
+    .game .choices .btn { font-size: 14px; padding: 9px 18px; }
+    .feedback { font-size: .95rem; margin-top: 14px; min-height: 3em; }
+    .score { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+    /* 02 pipeline */
+    .pipe { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; position: relative; }
+    .step { border: 1px solid var(--line); background: var(--bg); border-radius: 6px; padding: 10px 6px; text-align: center; cursor: pointer; font-family: var(--mono); font-size: 11.5px; line-height: 1.35; transition: all .2s; position: relative; }
+    .step .n { display: block; color: var(--muted); font-size: 10px; }
+    .step[aria-pressed="true"] { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 1px var(--accent); }
+    .step::after { content: ''; position: absolute; right: -6px; top: 50%; width: 6px; height: 1px; background: var(--line); }
+    .step:last-child::after { display: none; }
+    .stepdetail { margin-top: 14px; min-height: 8.5em; }
+    .stepdetail h3 { font-size: 1.1rem; font-weight: 500; margin-bottom: 4px; }
+    .stepdetail .tool { font-family: var(--mono); font-size: 11.5px; color: var(--accent); margin-bottom: 8px; display: block; }
+    .stepdetail p { font-size: .98rem; margin: 0; }
+    .flow { height: 4px; margin-top: 10px; background: var(--line); border-radius: 2px; overflow: hidden; }
+    .flow i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .5s ease; }
+
+    /* 03 bars */
+    .bars { margin-top: 16px; }
+    .bar { display: grid; grid-template-columns: 4.6em 1fr 4em; gap: 10px; align-items: center; font-family: var(--mono); font-size: 12.5px; height: 24px; }
+    .bar .k { text-align: right; color: var(--muted); }
+    .bar .track { height: 14px; position: relative; }
+    .bar .fill { position: absolute; left: 0; top: 0; bottom: 0; background: #cfcbbd; border-radius: 0 3px 3px 0; transition: width .6s cubic-bezier(.2,.8,.2,1); }
+    .bar.is-to .fill { background: var(--to); } .bar.is-from .fill { background: var(--from); } .bar.is-of .fill { background: repeating-linear-gradient(45deg,#cfcbbd 0 4px,#dedbcf 4px 8px); }
+    .bar.is-to .k, .bar.is-from .k { color: var(--text); font-weight: 500; }
+    .bar .v { color: var(--muted); }
+
+    /* 04 layers */
+    .layers { display: grid; grid-template-columns: 180px 1fr; gap: 24px; align-items: center; }
+    .stack { display: flex; flex-direction: column-reverse; gap: 3px; }
+    .layer { height: 15px; border-radius: 3px; background: var(--line); font-family: var(--mono); font-size: 9.5px; color: var(--muted); display: flex; align-items: center; padding-left: 8px; transition: background .25s, color .25s; }
+    .layer.on { background: #d9c3b5; color: var(--text); }
+    .layer.pick { background: var(--accent); color: #fff; }
+    .stack-in { font-family: var(--mono); font-size: 10px; color: var(--muted); text-align: center; margin-top: 6px; }
+    input[type=range] { width: 100%; accent-color: var(--accent); }
+    .regime { font-family: var(--mono); font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .08em; }
+    .mini { width: 100%; height: 150px; display: block; margin: 8px 0; background: var(--bg); border-radius: 6px; border: 1px solid var(--line); }
+
+    /* 05 explorer */
+    .explorer { background: var(--panel); border-radius: 10px; padding: 16px; }
+    .exbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .search { font-family: var(--mono); font-size: 12.5px; border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; width: 220px; background: var(--bg); }
+    .canvaswrap { position: relative; background: var(--bg); border-radius: 8px; border: 1px solid var(--line); }
+    #map { display: block; width: 100%; height: 520px; cursor: crosshair; touch-action: manipulation; }
+    .tip { position: absolute; pointer-events: none; max-width: 320px; background: var(--text); color: var(--bg); font-size: .88rem; line-height: 1.4; padding: 10px 12px; border-radius: 6px; opacity: 0; transition: opacity .12s; z-index: 2; }
+    .tip mark { background: rgba(255,255,255,.18); color: #fff; }
+    .tip .tm { font-family: var(--mono); font-size: 10.5px; opacity: .7; display: block; margin-bottom: 4px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 6px 8px; margin-top: 12px; }
+    .chip { font-family: var(--mono); font-size: 11.5px; border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 4px 10px 4px 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .chip i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+    .chip[aria-pressed="false"] { opacity: .4; }
+    .chip .c { color: var(--muted); }
+    .tour { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
+    .tour .label { margin: 0 4px 0 0; }
+    .reader { margin-top: 14px; background: var(--bg); border-radius: 8px; padding: 16px 18px; border: 1px solid var(--line); min-height: 7em; }
+    .reader .rh { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-bottom: 6px; }
+    .reader .rs { font-size: 1.08rem; line-height: 1.5; }
+    .reader ol { margin: 10px 0 0 1.2em; font-size: .95rem; color: var(--muted); }
+    .reader ol li { margin-bottom: 6px; }
+    .count { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+
+    /* 06 results */
+    .res { display: grid; grid-template-columns: 1.1fr 1fr; gap: 18px; }
+    .stackbars { display: flex; gap: 18px; height: 230px; align-items: flex-end; margin-top: 14px; }
+    .sb { flex: 1; display: flex; flex-direction: column; align-items: stretch; height: 100%; }
+    .sb .col { flex: 1; display: flex; flex-direction: column; border-radius: 4px; overflow: hidden; }
+    .sb .f { background: var(--from); transition: flex-grow .6s cubic-bezier(.2,.8,.2,1); display: flex; align-items: flex-start; justify-content: center; color: #fff; font-family: var(--mono); font-size: 11px; padding-top: 4px; min-height: 0; }
+    .sb .t { background: var(--to); transition: flex-grow .6s cubic-bezier(.2,.8,.2,1); display: flex; align-items: flex-end; justify-content: center; color: #fff; font-family: var(--mono); font-size: 11px; padding-bottom: 4px; min-height: 0; }
+    .sb .nm { font-family: var(--mono); font-size: 12px; text-align: center; margin-top: 6px; }
+    .key { display: flex; gap: 14px; font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 10px; }
+    .key i { width: 10px; height: 10px; display: inline-block; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+    #yearchart { width: 100%; height: 230px; display: block; margin-top: 14px; }
+    .big-stat { font-family: var(--mono); font-size: 2.6rem; color: var(--left); line-height: 1; }
+
+    /* refs */
+    .refs { font-size: .9rem; color: var(--muted); padding-left: 1.2em; }
+    .refs li { margin-bottom: 8px; }
+    pre.cite { font-family: var(--mono); font-size: 11.5px; background: var(--panel); padding: 14px; border-radius: 6px; white-space: pre-wrap; line-height: 1.5; }
+    footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--line); font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+    .reveal { opacity: 0; transform: translateY(14px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } html { scroll-behavior: auto; } }
+
+    @media (max-width: 700px) {
+      body { font-size: 18px; }
+      h1 { font-size: 1.9rem; }
+      .cards { grid-template-columns: 1fr; }
+      .pipe { grid-template-columns: repeat(4, 1fr); }
+      .step::after { display: none; }
+      .layers, .res { grid-template-columns: 1fr; }
+      .stack { max-width: 260px; }
+      #map { height: 420px; }
+      .search { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<div class="container" style="padding-bottom:0">
+
+  <a class="back" href="../">← Tava Reese</a>
+
+  <div class="kicker">Course project · Interactive walkthrough</div>
+  <h1>Two kinds of freedom: what British MPs mean when they say the word</h1>
+  <p class="byline"><strong>Tava Reese</strong> &amp; Aidan Kelley · Department of Linguistics, CU Boulder</p>
+  <div class="meta">LING 5200 Computational Corpus Linguistics · Dec 2025 &nbsp;
+    <a href="https://github.com/TavaReese/freedom-corpus-analysis/blob/main/paper/KELLEY_REESE_LING_5200_Final_Paper.pdf">paper ↗</a>
+    <a href="https://github.com/TavaReese/freedom-corpus-analysis">code ↗</a>
+    <a href="https://github.com/TavaReese/freedom-corpus-analysis/tree/main/data">data ↗</a>
+  </div>
+
+  <p class="lede">In 1958 the philosopher Isaiah Berlin argued that <em>freedom</em> is really two ideas wearing one word: freedom <span class="from">from</span> interference, and freedom <span class="to">to</span> be the master of your own life. We went looking for those two ideas in ten thousand sentences of real political speech, and asked a language model whether it could tell them apart.</p>
+
+  <div class="tldr">
+    <span class="label">TL;DR</span>
+    <p>Using the ParlaMint-GB corpus of UK parliamentary debates (2015–2020), we pulled 10,000 uses of <em>freedom</em>, counted what follows it, and mapped each occurrence through BERT. <strong>The model separates <span class="to">freedom to</span> and <span class="from">freedom from</span> into distinct regions of meaning</strong>, and in a logistic regression on speaker metadata, <strong>party was the only significant predictor</strong>: left-leaning MPs leaned toward <span class="from">freedom from</span>.</p>
+    <div class="cards">
+      <div class="card"><div class="big">10,000</div><p>occurrences of <em>freedom</em> from UK parliamentary speech</p></div>
+      <div class="card"><div class="big">2,266</div><p>contextual BERT embeddings, mapped below. Hover any one to read it.</p></div>
+      <div class="card"><div class="big">62%</div><p>less likely: left-leaning speakers' use of <span class="to">freedom to</span> vs. centre and right</p></div>
+    </div>
+  </div>
+
+  <!-- 01 -->
+  <section class="reveal" id="berlin">
+    <h2><span class="num">01</span><span>Two concepts of liberty</span></h2>
+    <p>Berlin's <em>negative liberty</em> is the classical liberal idea: a protected sphere that no person or state may enter. Freedom of speech and freedom of religion live here. His <em>positive liberty</em> asks a different question — <em>am I my own master?</em> — and is about capacity and self-direction rather than the absence of obstacles.</p>
+    <p>Berlin thought the difference mattered, because positive liberty can be captured: an authority can coerce people in the name of the "true" freedom they would want if they were rational. So we asked whether the distinction actually shows up in how people talk.</p>
+    <p>We operationalized the two concepts with the two most telling prepositions: <span class="from">freedom from</span> (negative) and <span class="to">freedom to</span> (positive). Before reading on, try it yourself. These are real sentences from the corpus with the preposition removed.</p>
+
+    <figure class="panel game" id="game" aria-live="polite">
+      <div class="row" style="justify-content:space-between"><span class="label" style="margin:0">Guess the preposition</span><span class="score" id="score">0 / 0</span></div>
+      <p class="sent" id="gsent">…</p>
+      <div class="choices">
+        <button class="btn" data-g="t">freedom <b>to</b></button>
+        <button class="btn" data-g="f">freedom <b>from</b></button>
+        <button class="btn" id="gnext" style="margin-left:auto">Next sentence →</button>
+      </div>
+      <p class="feedback" id="gfb"></p>
+      <figcaption><b>Why this is easier than it looks:</b> what follows the blank usually gives it away. <span class="to">Freedom to</span> takes a verb (<em>to choose, to decide, to operate</em>); <span class="from">freedom from</span> takes a noun naming a threat (<em>interference, torture, fear</em>). Our POS tagging confirmed this: 220 of the words after <em>freedom to</em> were verbs; none after <em>freedom from</em> were.</figcaption>
+    </figure>
+  </section>
+
+  <!-- 02 -->
+  <section class="reveal" id="method">
+    <h2><span class="num">02</span><span>The pipeline</span></h2>
+    <p>The study ran in three layers, from simple counting to a neural language model to a statistical test. Click through each stage.</p>
+    <figure class="panel">
+      <div class="pipe" id="pipe" role="group" aria-label="Pipeline stages"></div>
+      <div class="flow"><i id="flow"></i></div>
+      <div class="stepdetail" id="stepdetail"></div>
+    </figure>
+  </section>
+
+  <!-- 03 -->
+  <section class="reveal" id="bigrams">
+    <h2><span class="num">03</span><span>What comes after <em>freedom</em>?</span></h2>
+    <p>The first pass was plain corpus linguistics. We tokenized the sentences with NLTK and counted the word that directly follows <em>freedom</em>. Three prepositions dominate: <em>of</em>, <span class="to">to</span>, and <span class="from">from</span>, which map almost exactly onto Berlin's distinction.</p>
+    <p>We set <em>of</em> aside. It's the most common partner by far, but mostly inside fixed names for things — <em>freedom of information</em>, <em>freedom of movement</em>, <em>freedom of speech</em> — where the preposition no longer carries the speaker's framing.</p>
+    <figure class="panel">
+      <div class="row" style="justify-content:space-between">
+        <div class="seg" id="bparty" role="group" aria-label="Party">
+          <button aria-pressed="true" data-v="All">All</button><button aria-pressed="false" data-v="Left">Left</button><button aria-pressed="false" data-v="Centre">Centre</button><button aria-pressed="false" data-v="Right">Right</button>
+        </div>
+        <div class="seg" id="bscale" role="group" aria-label="Scale">
+          <button aria-pressed="true" data-v="n">count</button><button aria-pressed="false" data-v="r">per 1,000</button>
+        </div>
+      </div>
+      <div class="bars" id="bars"></div>
+      <figcaption><b>Figure 1.</b> The 12 most frequent tokens following <em>freedom</em>, recomputed from the 10,000-sentence sample. Switch to <em>per 1,000</em> to compare parties fairly: the right bloc simply speaks more in this corpus. Left speakers use <span class="from">freedom from</span> at roughly 1.4× the rate of the right.</figcaption>
+    </figure>
+  </section>
+
+  <!-- 04 -->
+  <section class="reveal" id="bert">
+    <h2><span class="num">04</span><span>Asking a language model</span></h2>
+    <p>Counting prepositions tells you about form. To see whether the <em>meanings</em> separate, we passed every sentence through BERT Base Uncased, a 12-layer encoder, and kept only the vector for the token <em>freedom</em>. Each transformer layer mixes in more information from the surrounding sentence, so the vector that comes out of layer 6 is <em>freedom</em> as colored by its context.</p>
+    <p>The key design choice was which layer to read from. Or, as we put it in the paper: how long do the embeddings stay in the oven?</p>
+    <figure class="panel">
+      <div class="layers">
+        <div>
+          <div class="stack" id="stack"></div>
+          <div class="stack-in">↑ token embedding in</div>
+        </div>
+        <div>
+          <label for="lslider" class="label" style="margin-bottom:4px">Read from layer <span id="lval">6</span> of 12</label>
+          <input type="range" id="lslider" min="1" max="12" value="6" />
+          <canvas class="mini" id="mini" aria-hidden="true"></canvas>
+          <div class="regime" id="lreg"></div>
+          <p id="ldesc" style="font-size:.98rem;margin:4px 0 0"></p>
+        </div>
+      </div>
+      <figcaption><b>Figure 2.</b> A schematic of what we observed while tuning, not a re-run of the model: early layers fragmented the data into many tiny groups, the final layer collapsed it toward one. Layer 6 gave clear, stable clusters, consistent with work showing mid-layer representations often beat final ones for semantic tasks (Skean et al., 2025; Voita et al., 2019).</figcaption>
+    </figure>
+    <p>Each <em>freedom</em> vector has 768 dimensions. We grouped them with <strong>HDBSCAN</strong> (minimum cluster size 10) and flattened them to two dimensions with <strong>t-SNE</strong> (perplexity 30) so a person can look at them. Points that sit close together were close in BERT's representation space; the axes themselves mean nothing.</p>
+  </section>
+</div>
+
+<!-- 05 wide -->
+<section class="reveal wide" id="map-section" style="padding:0 20px">
+  <div style="max-width:720px;margin:0 auto">
+    <h2><span class="num">05</span><span>The map of <em>freedom</em></span></h2>
+    <p>Here is the result: every occurrence of <em>freedom</em> from the 3,000-sentence BERT sample, placed by meaning. Hover a point to read its sentence, click to pin it, or search for a word. Use the buttons to switch between the clusters, the two constructions, and speaker party.</p>
+  </div>
+  <figure class="explorer">
+    <div class="exbar">
+      <div class="seg" id="mode" role="group" aria-label="Color by">
+        <button aria-pressed="true" data-v="theme">Clusters</button><button aria-pressed="false" data-v="phrase">to / from</button><button aria-pressed="false" data-v="party">Party</button>
+      </div>
+      <div class="row"><input class="search" id="search" type="search" placeholder="search sentences… e.g. torture" aria-label="Search sentences" /><span class="count" id="count"></span></div>
+    </div>
+    <div class="canvaswrap">
+      <canvas id="map" aria-label="Scatter plot of 2,266 freedom embeddings"></canvas>
+      <div class="tip" id="tip"></div>
+    </div>
+    <div class="legend" id="legend"></div>
+    <div class="tour"><span class="label">Take a look at</span>
+      <button class="btn" data-tour="3">the <span class="to">freedom to</span> cluster</button>
+      <button class="btn" data-tour="0">the <span class="from">freedom from</span> cluster</button>
+      <button class="btn" data-tour="1">freedom of information</button>
+      <button class="btn" data-tour="11">freedom of movement</button>
+    </div>
+    <div class="reader" id="reader" aria-live="polite">
+      <div class="rh">Reading panel</div>
+      <div class="rs" style="color:var(--muted)">Click any point, or pick a tour stop above.</div>
+    </div>
+    <figcaption><b>Figure 3.</b> t-SNE projection of layer-6 BERT embeddings for <em>freedom</em>, colored by HDBSCAN cluster. The 57 clusters are grouped into broader themes by us for readability (by their most distinctive words); grey points are ones HDBSCAN marked as noise. Coordinates are taken directly from the original notebook output.</figcaption>
+  </figure>
+  <div style="max-width:720px;margin:0 auto">
+    <p>Two things stand out. The largest cluster in the whole map holds the large majority of <span class="to">freedom to</span> sentences, and it also pulls in sentences <em>without</em> the bigram that share its sense of ability: <em>freedom for civil society to operate</em>, <em>freedom for local planning</em>. The model found the concept, not just the preposition.</p>
+    <p>Meanwhile, <span class="from">freedom from</span> forms a small, tight island of its own. Its most central sentence speaks of a judicial system designed to guarantee <em>neutrality and freedom from political interference</em>, which reads almost like Berlin's own definition of negative liberty. Switch to <strong>Party</strong> and you'll see the other half of the story: no region of meaning belongs to one party. The difference is in proportion, not territory.</p>
+  </div>
+</section>
+
+<div class="container" style="padding-top:0">
+  <!-- 06 -->
+  <section class="reveal" id="results">
+    <h2><span class="num">06</span><span>Who says which?</span></h2>
+    <p>Finally we fit a binomial logistic regression in R, predicting construction type from speaker metadata:</p>
+    <pre class="cite" style="font-size:13px">ConstructionType ~ Gender + Party + Year</pre>
+    <p>Gender and year were not significant. Party was. <strong>Left-leaning speakers were 62% less likely to use <span class="to">freedom to</span></strong> than centre or right speakers, favoring <span class="from">freedom from</span> instead.</p>
+    <figure class="panel">
+      <div class="res">
+        <div>
+          <div class="row" style="justify-content:space-between">
+            <span class="label" style="margin:0">Share by bloc</span>
+            <div class="seg" id="pview" role="group" aria-label="View">
+              <button aria-pressed="true" data-v="norm">normalized</button><button aria-pressed="false" data-v="raw">raw</button>
+            </div>
+          </div>
+          <div class="stackbars" id="stackbars"></div>
+          <div class="key"><span><i style="background:var(--to)"></i>freedom to</span><span><i style="background:var(--from)"></i>freedom from</span></div>
+        </div>
+        <div>
+          <span class="label" style="margin:0">Over time (normalized)</span>
+          <svg id="yearchart" viewBox="0 0 320 230" role="img" aria-label="Normalized share of freedom to and freedom from by year"></svg>
+        </div>
+      </div>
+      <figcaption id="pcap"></figcaption>
+    </figure>
+    <p>Over 2015–2019 there's a hint of <span class="from">freedom from</span> gaining ground, but the trend wasn't significant and five years is a short window. It's the first thing we'd test with more data.</p>
+  </section>
+
+  <!-- 07 -->
+  <section class="reveal" id="next">
+    <h2><span class="num">07</span><span>Limits and what's next</span></h2>
+    <p><strong>Two bigrams are a narrow window.</strong> Berlin's concepts can be expressed many ways; <em>freedom of</em> and constructions without a preposition were excluded to keep the model binary.</p>
+    <p><strong>The map is a sample.</strong> Memory limits meant BERT ran on the first 3,000 of 10,000 sentences. Batched inference would fix this.</p>
+    <p><strong>t-SNE is a flattening.</strong> A 2D picture can't preserve every relationship among 768-dimensional vectors, so we read it alongside the counts and the regression, never on its own.</p>
+    <p><strong>Next:</strong> extend to <em>freedom of</em> and other constructions, use a longer time span to test the temporal shift, and run the same pipeline on American congressional speech.</p>
+  </section>
+
+  <section class="reveal" id="refs">
+    <h2><span class="num">↳</span><span>References</span></h2>
+    <ol class="refs">
+      <li>Berlin, I. (1969). Two concepts of liberty. In <em>Four essays on liberty</em> (pp. 118–172). Oxford University Press.</li>
+      <li>Bird, S., Klein, E., &amp; Loper, E. (2009). <em>Natural Language Processing with Python</em>. O'Reilly Media.</li>
+      <li>Devlin, J., Chang, M.-W., Lee, K., &amp; Toutanova, K. (2018). <a href="https://arxiv.org/abs/1810.04805">BERT: Pre-training of deep bidirectional transformers for language understanding</a>.</li>
+      <li>Erjavec, T., et al. (2022). <a href="https://doi.org/10.1007/s10579-021-09574-0">The ParlaMint corpora of parliamentary proceedings</a>. <em>Language Resources and Evaluation</em>, 57(1), 415–448.</li>
+      <li>Skean, O., et al. (2025). <a href="https://arxiv.org/abs/2502.02013">Layer by layer: Uncovering hidden representations in language models</a>.</li>
+      <li>Voita, E., Sennrich, R., &amp; Titov, I. (2019). <a href="https://arxiv.org/pdf/1909.01380">The bottom-up evolution of representations in the transformer</a>.</li>
+    </ol>
+    <span class="label" style="margin-top:24px">Cite this project</span>
+    <div style="position:relative">
+      <pre class="cite" id="bib">@misc{reese_kelley_2025_freedom,
+  title  = {Freedom: A Corpus-Based Analysis of Meaning in English Discourse},
+  author = {Reese, Tava and Kelley, Aidan},
+  year   = {2025},
+  note   = {LING 5200, University of Colorado Boulder},
+  url    = {https://github.com/TavaReese/freedom-corpus-analysis}
+}</pre>
+      <button class="btn" id="copybib" style="position:absolute;top:8px;right:8px;font-size:11px;padding:4px 10px">copy</button>
+    </div>
+  </section>
+
+  <footer>Built with plain HTML, CSS and canvas · embedding coordinates from the project notebook · <a href="../" style="text-decoration:none">tavareese.github.io</a></footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+(() => {
+const D = window.FREEDOM;
+const $ = s => document.querySelector(s);
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const markF = s => esc(s).replace(/\b(freedoms?)\b/gi, '<mark>$1</mark>');
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const setSeg = (el, v) => el.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v));
+
+// reveal on scroll
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .08 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ---------- 01 game ---------- */
+const pool = D.pts.filter(p => p[4] !== 'o').map(p => {
+  const m = p[6].match(/\bfreedom\s+(to|from)\b/i);
+  return m ? { s: p[6], ans: m[1].toLowerCase() === 'to' ? 't' : 'f', i: m.index, len: m[0].length } : null;
+}).filter(q => q && q.s.length < 260);
+const toPool = pool.filter(q => q.ans === 't'), fromPool = pool.filter(q => q.ans === 'f');
+let cur, right = 0, total = 0, answered = false;
+function nextQ() {
+  const src = Math.random() < .5 ? fromPool : toPool;
+  cur = src[Math.floor(Math.random() * src.length)];
+  const before = esc(cur.s.slice(0, cur.i)), after = esc(cur.s.slice(cur.i + cur.len));
+  const word = cur.s.slice(cur.i).match(/^freedom/i)[0];
+  $('#gsent').innerHTML = `${before}${word} <span class="blank" id="blank">&nbsp;?&nbsp;</span>${after}`;
+  $('#gfb').textContent = ''; answered = false;
+  document.querySelectorAll('[data-g]').forEach(b => b.disabled = false);
+}
+document.querySelectorAll('[data-g]').forEach(b => b.addEventListener('click', () => {
+  if (answered) return; answered = true; total++;
+  const ok = b.dataset.g === cur.ans; if (ok) right++;
+  const isTo = cur.ans === 't';
+  const bl = $('#blank'); bl.textContent = isTo ? 'to' : 'from'; bl.style.color = isTo ? css('--to') : css('--from');
+  $('#gfb').innerHTML = (ok ? '<b>Right.</b> ' : '<b>Not this time.</b> ') + (isTo
+    ? 'This is <span class="to">freedom to</span>: Berlin\'s <em>positive</em> liberty, a capacity to act.'
+    : 'This is <span class="from">freedom from</span>: Berlin\'s <em>negative</em> liberty, the absence of a threat.');
+  $('#score').textContent = `${right} / ${total}`;
+  document.querySelectorAll('[data-g]').forEach(x => x.disabled = true);
+}));
+$('#gnext').addEventListener('click', nextQ);
+nextQ();
+
+/* ---------- 02 pipeline ---------- */
+const steps = [
+  ['Collect','SketchEngine','10,000 concordance lines for <em>freedom</em> from ParlaMint-GB (113M tokens of UK parliamentary debate, 2015–2020), each tagged with speaker name, gender, party and date. SketchEngine caps downloads at 10,000.'],
+  ['Clean','R · tidyverse','Speaker metadata split into columns; British parties recoded into three ideological blocs: Left, Centre, Right. A binary outcome added: 1 = <span class="to">freedom to</span>, 0 = <span class="from">freedom from</span>.'],
+  ['Count','Python · NLTK','Tokenize, build concordances and collocations, and count bigrams. 1,139 <span class="to">freedom to</span> and 150 <span class="from">freedom from</span>. POS tagging confirmed the prepositions behave as expected.'],
+  ['Embed','BERT Base Uncased','Each sentence runs through 12 transformer layers. We keep only the 768-dimensional vector for <em>freedom</em> at layer 6, where context has shaped it but not washed it out.'],
+  ['Cluster','HDBSCAN','Density-based clustering groups vectors that sit close together. Minimum cluster size 10; points in sparse regions are labeled noise rather than forced into a group.'],
+  ['Flatten','t-SNE','768 dimensions are projected to 2 for plotting (perplexity 30), preserving local neighborhoods. Nearby points stay nearby; the axes have no meaning.'],
+  ['Model','R · logistic regression','<code>ConstructionType ~ Gender + Party + Year</code>. Party is the only significant predictor of which construction a speaker uses.']
+];
+const pipe = $('#pipe');
+steps.forEach((s, i) => {
+  const b = document.createElement('button'); b.className = 'step'; b.innerHTML = `<span class="n">0${i+1}</span>${s[0]}`;
+  b.addEventListener('click', () => showStep(i)); pipe.appendChild(b);
+});
+function showStep(i) {
+  pipe.querySelectorAll('.step').forEach((b, j) => b.setAttribute('aria-pressed', i === j));
+  const s = steps[i];
+  $('#stepdetail').innerHTML = `<h3>${s[0]}</h3><span class="tool">${s[1]}</span><p>${s[2]}</p>`;
+  $('#flow').style.width = ((i + 1) / steps.length * 100) + '%';
+}
+showStep(0);
+
+/* ---------- 03 bigrams ---------- */
+let bp = 'All', bs = 'n';
+function drawBars() {
+  const B = D.bigrams[bp]; const vals = B.top.map(([w, k]) => [w, bs === 'n' ? k : k / B.n * 1000]);
+  const max = Math.max(...vals.map(v => v[1]));
+  $('#bars').innerHTML = vals.map(([w, v]) => {
+    const cls = w === 'to' ? 'is-to' : w === 'from' ? 'is-from' : w === 'of' ? 'is-of' : '';
+    return `<div class="bar ${cls}"><span class="k">${esc(w)}</span><span class="track"><span class="fill" style="width:0"></span></span><span class="v">${bs === 'n' ? v.toLocaleString() : v.toFixed(1)}</span></div>`;
+  }).join('');
+  requestAnimationFrame(() => requestAnimationFrame(() =>
+    $('#bars').querySelectorAll('.fill').forEach((f, i) => f.style.width = (vals[i][1] / max * 100) + '%')));
+}
+$('#bparty').addEventListener('click', e => { if (e.target.dataset.v) { bp = e.target.dataset.v; setSeg($('#bparty'), bp); drawBars(); } });
+$('#bscale').addEventListener('click', e => { if (e.target.dataset.v) { bs = e.target.dataset.v; setSeg($('#bscale'), bs); drawBars(); } });
+drawBars();
+
+/* ---------- 04 layers ---------- */
+const stack = $('#stack');
+for (let i = 1; i <= 12; i++) { const d = document.createElement('div'); d.className = 'layer'; d.textContent = 'layer ' + i; stack.appendChild(d); }
+const mini = $('#mini'), mctx = mini.getContext('2d');
+// deterministic pseudo-random
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const blobs = Array.from({ length: 9 }, () => [rnd(), rnd()]);
+const dots = Array.from({ length: 260 }, (_, i) => ({ b: i % 9, a: rnd() * 6.28, r: rnd(), fx: rnd(), fy: rnd(), k: i % 9 === 0 ? 'f' : i % 9 === 1 ? 't' : 'o' }));
+function drawMini(L) {
+  const dpr = devicePixelRatio || 1, w = mini.clientWidth, h = mini.clientHeight;
+  mini.width = w * dpr; mini.height = h * dpr; mctx.setTransform(dpr, 0, 0, dpr, 0, 0); mctx.clearRect(0, 0, w, h);
+  // L<6: fragmented (spread), 6: clean blobs, >6: collapse to center
+  const frag = Math.max(0, (6 - L) / 5), coll = Math.max(0, (L - 6) / 6);
+  dots.forEach(d => {
+    const [bx, by] = blobs[d.b];
+    let x = .12 + bx * .76, y = .15 + by * .7;
+    const rad = .05 + frag * .02;
+    x += Math.cos(d.a) * d.r * rad; y += Math.sin(d.a) * d.r * rad * 1.6;
+    x = x * (1 - frag) + (.05 + d.fx * .9) * frag; y = y * (1 - frag) + (.08 + d.fy * .84) * frag;
+    x = x * (1 - coll * .85) + .5 * coll * .85 + Math.cos(d.a) * d.r * .04 * coll; y = y * (1 - coll * .85) + .5 * coll * .85 + Math.sin(d.a) * d.r * .1 * coll;
+    mctx.fillStyle = d.k === 't' ? css('--to') : d.k === 'f' ? css('--from') : '#c9c5b8';
+    mctx.beginPath(); mctx.arc(x * w, y * h, 2.4, 0, 6.29); mctx.fill();
+  });
+}
+function setLayer(L) {
+  $('#lval').textContent = L;
+  stack.querySelectorAll('.layer').forEach((d, i) => { d.className = 'layer' + (i + 1 < L ? ' on' : i + 1 === L ? ' pick' : ''); });
+  let reg, txt;
+  if (L <= 3) { reg = 'Underbaked'; txt = 'Too little context. Vectors barely move from the stock embedding, so differences are hyper-local and the plot shatters into many tiny fragments with no clear framing.'; }
+  else if (L <= 7) { reg = L === 6 ? 'The sweet spot · what we used' : 'Getting close'; txt = 'Enough context to separate senses of the word without losing the phrase it sits in. Freedom to and freedom from form distinct groups; the data neither collapses nor fragments.'; }
+  else { reg = 'Overbaked'; txt = 'Late layers pull every occurrence toward one generic "freedom." Nuance from the immediate phrase, including to versus from, gets washed out and groups converge.'; }
+  $('#lreg').textContent = reg; $('#ldesc').textContent = txt; drawMini(L);
+}
+$('#lslider').addEventListener('input', e => setLayer(+e.target.value));
+setLayer(6);
+
+/* ---------- 05 map ---------- */
+const THEMES = {
+  to:     ['freedom to (ability, agency)', '#3d6e8c'],
+  from:   ['freedom from (interference, harm)', '#b05c3a'],
+  info:   ['freedom of information', '#7b8f4a'],
+  move:   ['freedom of movement / EU', '#8c6bb1'],
+  speech: ['speech, academic freedom', '#c9952f'],
+  rel:    ['religion & belief', '#5f9e95'],
+  rights: ['human rights abroad, assembly', '#a5596f'],
+  local:  ['local & institutional autonomy', '#6f87b8'],
+  values: ['democracy, values, sacrifice', '#9a7a52'],
+  press:  ['press & media', '#d17c5a'],
+  noise:  ['unclustered (noise)', '#cfcbbd']
+};
+const PHRASE = { t: ['freedom to', css('--to')], f: ['freedom from', css('--from')], o: ['other uses', '#d6d2c6'] };
+const PARTY = { L: ['Left', css('--left')], C: ['Centre', css('--centre')], R: ['Right', css('--right')], O: ['Other', css('--other')] };
+const pts = D.pts.map(p => ({ x: p[0], y: p[1], c: p[2], th: p[3], ph: p[4], pa: p[5], t: p[6], lt: p[6].toLowerCase() }));
+const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+const ext = { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
+const canvas = $('#map'), ctx = canvas.getContext('2d'), tip = $('#tip');
+let mode = 'theme', query = '', hidden = new Set(), hover = null, pinned = null, focusCluster = null, W = 0, H = 0, anim = reduce ? 1 : 0, started = false;
+pts.forEach(p => { p.sx = Math.random(); p.sy = Math.random(); });
+const keyOf = p => mode === 'theme' ? p.th : mode === 'phrase' ? p.ph : p.pa;
+const colorOf = p => mode === 'theme' ? THEMES[p.th][1] : mode === 'phrase' ? PHRASE[p.ph][1] : PARTY[p.pa][1];
+const match = p => (!query || p.lt.includes(query)) && !hidden.has(keyOf(p)) && (focusCluster === null || p.c === focusCluster);
+function proj(p) {
+  const pad = 18, e = ease(anim);
+  const tx = pad + (p.x - ext.x0) / (ext.x1 - ext.x0) * (W - 2 * pad), ty = pad + (1 - (p.y - ext.y0) / (ext.y1 - ext.y0)) * (H - 2 * pad);
+  return [p.sx * W * (1 - e) + tx * e, p.sy * H * (1 - e) + ty * e];
+}
+const ease = t => 1 - Math.pow(1 - t, 3);
+function resize() {
+  const dpr = devicePixelRatio || 1; W = canvas.clientWidth; H = canvas.clientHeight;
+  canvas.width = W * dpr; canvas.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); draw();
+}
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  const r = W < 500 ? 2.6 : 3.4;
+  // draw order: dimmed first, then 'other' phrase underneath, then highlights
+  const order = pts.slice().sort((a, b) => (match(a) - match(b)) || (mode === 'phrase' ? (a.ph === 'o') - (b.ph === 'o') : 0) * -1);
+  for (const p of order) {
+    const [x, y] = proj(p); p.px = x; p.py = y; const on = match(p);
+    ctx.globalAlpha = on ? (mode === 'phrase' && p.ph === 'o' ? .55 : .85) : .08;
+    ctx.fillStyle = colorOf(p);
+    ctx.beginPath(); ctx.arc(x, y, (mode === 'phrase' && p.ph !== 'o' && on) ? r + 1.2 : r, 0, 6.29); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  for (const p of [hover, pinned]) if (p) {
+    ctx.strokeStyle = '#1a1a18'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(p.px, p.py, r + 4, 0, 6.29); ctx.stroke();
+  }
+  const n = pts.filter(match).length; $('#count').textContent = n === pts.length ? `${n.toLocaleString()} points` : `${n.toLocaleString()} of ${pts.length.toLocaleString()}`;
+}
+function intro() {
+  if (started) return; started = true;
+  if (reduce) { anim = 1; draw(); return; }
+  const t0 = performance.now();
+  const step = t => { anim = Math.min(1, (t - t0) / 1400); draw(); if (anim < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+new IntersectionObserver(es => es.forEach(e => e.isIntersecting && intro()), { threshold: .3 }).observe(canvas);
+function nearest(mx, my) {
+  let best = null, bd = 196;
+  for (const p of pts) { if (!match(p)) continue; const d = (p.px - mx) ** 2 + (p.py - my) ** 2; if (d < bd) { bd = d; best = p; } }
+  return best;
+}
+const meta = p => `${THEMES[p.th][0]} · cluster ${p.c < 0 ? '—' : p.c} · ${PARTY[p.pa][0]}`;
+canvas.addEventListener('mousemove', e => {
+  const b = canvas.getBoundingClientRect(), mx = e.clientX - b.left, my = e.clientY - b.top;
+  const p = nearest(mx, my);
+  if (p !== hover) { hover = p; draw(); }
+  if (p) {
+    tip.innerHTML = `<span class="tm">${esc(meta(p))}</span>${markF(p.t.length > 240 ? p.t.slice(0, 240) + '…' : p.t)}`;
+    tip.style.opacity = 1;
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    tip.style.left = Math.min(Math.max(4, p.px + 14), W - tw - 4) + 'px';
+    tip.style.top = (p.py + 14 + th > H ? p.py - th - 14 : p.py + 14) + 'px';
+  } else tip.style.opacity = 0;
+});
+canvas.addEventListener('mouseleave', () => { hover = null; tip.style.opacity = 0; draw(); });
+canvas.addEventListener('click', e => {
+  const b = canvas.getBoundingClientRect(); const p = nearest(e.clientX - b.left, e.clientY - b.top);
+  if (p) pin(p);
+});
+function pin(p, intro) {
+  pinned = p; draw();
+  const C = D.clusters[p.c];
+  let html = `<div class="rh">${esc(meta(p))}</div><div class="rs">${intro || ''}${markF(p.t)}</div>`;
+  if (C) {
+    const mix = `${C.n} points · ${C.to} freedom to · ${C.from} freedom from`;
+    html += `<div class="rh" style="margin-top:14px">Cluster ${p.c} · ${mix} · sentences closest to its center:</div><ol>${C.reps.map(r => `<li>${markF(r)}</li>`).join('')}</ol>`;
+    html += `<div class="row" style="margin-top:8px"><button class="btn" id="isolate">${focusCluster === p.c ? 'Show all clusters' : 'Isolate this cluster'}</button></div>`;
+  }
+  $('#reader').innerHTML = html;
+  const iso = $('#isolate'); if (iso) iso.onclick = () => { focusCluster = focusCluster === p.c ? null : p.c; pin(p); };
+}
+document.querySelectorAll('[data-tour]').forEach(b => b.addEventListener('click', () => {
+  const c = +b.dataset.tour, C = D.clusters[c];
+  if (c === 0 || c === 3) { mode = 'phrase'; setSeg($('#mode'), mode); buildLegend(); }
+  else { mode = 'theme'; setSeg($('#mode'), mode); buildLegend(); }
+  const rep = pts.find(p => p.t === C.reps[0] && p.c === c) || pts.find(p => p.c === c);
+  focusCluster = null; pin(rep);
+  if (!started) intro();
+}));
+function buildLegend() {
+  hidden.clear();
+  const src = mode === 'theme' ? THEMES : mode === 'phrase' ? PHRASE : PARTY;
+  const counts = {}; pts.forEach(p => counts[keyOf(p)] = (counts[keyOf(p)] || 0) + 1);
+  const keys = Object.keys(src).filter(k => counts[k]);
+  $('#legend').innerHTML = keys.map(k => `<button class="chip" aria-pressed="true" data-k="${k}"><i style="background:${src[k][1]}"></i>${src[k][0]} <span class="c">${counts[k]}</span></button>`).join('');
+  draw();
+}
+$('#legend').addEventListener('click', e => {
+  const ch = e.target.closest('.chip'); if (!ch) return; const k = ch.dataset.k;
+  hidden.has(k) ? hidden.delete(k) : hidden.add(k); ch.setAttribute('aria-pressed', !hidden.has(k)); draw();
+});
+$('#mode').addEventListener('click', e => { const v = e.target.closest('button')?.dataset.v; if (v) { mode = v; setSeg($('#mode'), v); buildLegend(); } });
+$('#search').addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); draw(); });
+addEventListener('resize', resize);
+resize(); buildLegend();
+
+/* ---------- 06 results ---------- */
+let pv = 'norm';
+function drawParty() {
+  $('#stackbars').innerHTML = ['Left', 'Centre', 'Right'].map(k => {
+    const P = D.party[k]; const t = pv === 'norm' ? P.norm_to : P.to / (P.to + P.from);
+    return `<div class="sb"><div class="col"><div class="f" style="flex-grow:${1 - t}">${Math.round((1 - t) * 100)}%</div><div class="t" style="flex-grow:${t}">${Math.round(t * 100)}%</div></div><div class="nm">${k}</div></div>`;
+  }).join('');
+  const L = D.party.Left, T = D.totals;
+  $('#pcap').innerHTML = pv === 'norm'
+    ? `<b>Figure 4.</b> Each bloc's use of each construction as a share of all uses of that construction (${T.to.toLocaleString()} <em>to</em>, ${T.from} <em>from</em>), so the rarer <em>freedom from</em> isn't drowned out. On this scale the left bloc is the only one where <span class="from">freedom from</span> outweighs <span class="to">freedom to</span>. Recomputed from the repository CSV.`
+    : `<b>Figure 4 (raw).</b> In absolute terms <span class="to">freedom to</span> is far more common for everyone. The left bloc's ${L.from} <em>freedom from</em> against ${L.to} <em>freedom to</em> is still the highest ratio of the three, which is the difference the regression picks up.`;
+}
+$('#pview').addEventListener('click', e => { const v = e.target.closest('button')?.dataset.v; if (v) { pv = v; setSeg($('#pview'), v); drawParty(); } });
+drawParty();
+
+(function yearChart() {
+  const svg = $('#yearchart'), yrs = Object.keys(D.year).map(Number);
+  const X = y => 40 + (y - yrs[0]) / (yrs[yrs.length - 1] - yrs[0]) * 260, Y = v => 200 - (v - .2) / .6 * 180;
+  let g = '';
+  [.2, .4, .5, .6, .8].forEach(v => g += `<line x1="40" x2="300" y1="${Y(v)}" y2="${Y(v)}" stroke="${css('--line')}" ${v === .5 ? 'stroke-dasharray="3 3"' : ''}/>` + (v === .5 ? '' : `<text x="34" y="${Y(v) + 4}" text-anchor="end" font-family="DM Mono" font-size="10" fill="${css('--muted')}">${v * 100}%</text>`));
+  yrs.forEach(y => g += `<text x="${X(y)}" y="222" text-anchor="middle" font-family="DM Mono" font-size="10" fill="${css('--muted')}">${y}</text>`);
+  const fit = arr => { const n = arr.length, mx = arr.reduce((s, a) => s + a[0], 0) / n, my = arr.reduce((s, a) => s + a[1], 0) / n;
+    const b = arr.reduce((s, a) => s + (a[0] - mx) * (a[1] - my), 0) / arr.reduce((s, a) => s + (a[0] - mx) ** 2, 0); return x => my + b * (x - mx); };
+  [['to', css('--to'), v => v], ['from', css('--from'), v => 1 - v]].forEach(([k, col, f]) => {
+    const arr = yrs.map(y => [y, f(D.year[y].norm_to)]), fn = fit(arr);
+    g += `<line x1="${X(yrs[0])}" y1="${Y(fn(yrs[0]))}" x2="${X(yrs.at(-1))}" y2="${Y(fn(yrs.at(-1)))}" stroke="${col}" stroke-width="2" opacity=".85"/>`;
+    arr.forEach(([y, v]) => g += `<circle cx="${X(y)}" cy="${Y(v)}" r="4" fill="${col}"><title>${y}: freedom ${k} ${Math.round(v * 100)}%</title></circle>`);
+  });
+  svg.innerHTML = g;
+})();
+
+/* copy */
+$('#copybib').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText($('#bib').textContent); $('#copybib').textContent = 'copied'; } catch { $('#copybib').textContent = 'select & copy'; }
+  setTimeout(() => $('#copybib').textContent = 'copy', 1600);
+});
+})();
+</script>
+</body>
+</html>
