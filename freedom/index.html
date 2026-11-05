@@ -62,14 +62,6 @@
     .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
     mark { background: rgba(176,92,58,.16); color: inherit; padding: 0 2px; border-radius: 2px; font-weight: 500; }
 
-    /* 01 game */
-    .game .sent { font-size: 1.2rem; line-height: 1.55; min-height: 5.2em; margin: 12px 0 16px; }
-    .blank { display: inline-block; min-width: 3.4em; border-bottom: 2px solid var(--text); text-align: center; font-weight: 500; transition: color .2s; }
-    .game .choices { display: flex; gap: 10px; flex-wrap: wrap; }
-    .game .choices .btn { font-size: 14px; padding: 9px 18px; }
-    .feedback { font-size: .95rem; margin-top: 14px; min-height: 3em; }
-    .score { font-family: var(--mono); font-size: 12px; color: var(--muted); }
-
     /* 02 pipeline */
     .pipe { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; position: relative; }
     .step { border: 1px solid var(--line); background: var(--bg); border-radius: 6px; padding: 10px 6px; text-align: center; cursor: pointer; font-family: var(--mono); font-size: 11.5px; line-height: 1.35; transition: all .2s; position: relative; }
@@ -195,19 +187,7 @@
     <h2><span class="num">01</span><span>Two concepts of liberty</span></h2>
     <p>Berlin's <em>negative liberty</em> is the classical liberal idea: a protected sphere that no person or state may enter. Freedom of speech and freedom of religion live here. His <em>positive liberty</em> asks a different question — <em>am I my own master?</em> — and is about capacity and self-direction rather than the absence of obstacles.</p>
     <p>Berlin thought the difference mattered, because positive liberty can be captured: an authority can coerce people in the name of the "true" freedom they would want if they were rational. So we asked whether the distinction actually shows up in how people talk.</p>
-    <p>We operationalized the two concepts with the two most telling prepositions: <span class="from">freedom from</span> (negative) and <span class="to">freedom to</span> (positive). Before reading on, try it yourself. These are real sentences from the corpus with the preposition removed.</p>
-
-    <figure class="panel game" id="game" aria-live="polite">
-      <div class="row" style="justify-content:space-between"><span class="label" style="margin:0">Guess the preposition</span><span class="score" id="score">0 / 0</span></div>
-      <p class="sent" id="gsent">…</p>
-      <div class="choices">
-        <button class="btn" data-g="t">freedom <b>to</b></button>
-        <button class="btn" data-g="f">freedom <b>from</b></button>
-        <button class="btn" id="gnext" style="margin-left:auto">Next sentence →</button>
-      </div>
-      <p class="feedback" id="gfb"></p>
-      <figcaption><b>Why this is easier than it looks:</b> what follows the blank usually gives it away. <span class="to">Freedom to</span> takes a verb (<em>to choose, to decide, to operate</em>); <span class="from">freedom from</span> takes a noun naming a threat (<em>interference, torture, fear</em>). Our POS tagging confirmed this: 220 of the words after <em>freedom to</em> were verbs; none after <em>freedom from</em> were.</figcaption>
-    </figure>
+    <p>We operationalized the two concepts with the two most telling prepositions: <span class="from">freedom from</span> (negative) and <span class="to">freedom to</span> (positive).</p>
   </section>
 
   <!-- 02 -->
@@ -379,36 +359,6 @@ const setSeg = (el, v) => el.querySelectorAll('button').forEach(b => b.setAttrib
 // reveal on scroll
 const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .08 });
 document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-
-/* ---------- 01 game ---------- */
-const pool = D.pts.filter(p => p[4] !== 'o').map(p => {
-  const m = p[6].match(/\bfreedom\s+(to|from)\b/i);
-  return m ? { s: p[6], ans: m[1].toLowerCase() === 'to' ? 't' : 'f', i: m.index, len: m[0].length } : null;
-}).filter(q => q && q.s.length < 260);
-const toPool = pool.filter(q => q.ans === 't'), fromPool = pool.filter(q => q.ans === 'f');
-let cur, right = 0, total = 0, answered = false;
-function nextQ() {
-  const src = Math.random() < .5 ? fromPool : toPool;
-  cur = src[Math.floor(Math.random() * src.length)];
-  const before = esc(cur.s.slice(0, cur.i)), after = esc(cur.s.slice(cur.i + cur.len));
-  const word = cur.s.slice(cur.i).match(/^freedom/i)[0];
-  $('#gsent').innerHTML = `${before}${word} <span class="blank" id="blank">&nbsp;?&nbsp;</span>${after}`;
-  $('#gfb').textContent = ''; answered = false;
-  document.querySelectorAll('[data-g]').forEach(b => b.disabled = false);
-}
-document.querySelectorAll('[data-g]').forEach(b => b.addEventListener('click', () => {
-  if (answered) return; answered = true; total++;
-  const ok = b.dataset.g === cur.ans; if (ok) right++;
-  const isTo = cur.ans === 't';
-  const bl = $('#blank'); bl.textContent = isTo ? 'to' : 'from'; bl.style.color = isTo ? css('--to') : css('--from');
-  $('#gfb').innerHTML = (ok ? '<b>Right.</b> ' : '<b>Not this time.</b> ') + (isTo
-    ? 'This is <span class="to">freedom to</span>: Berlin\'s <em>positive</em> liberty, a capacity to act.'
-    : 'This is <span class="from">freedom from</span>: Berlin\'s <em>negative</em> liberty, the absence of a threat.');
-  $('#score').textContent = `${right} / ${total}`;
-  document.querySelectorAll('[data-g]').forEach(x => x.disabled = true);
-}));
-$('#gnext').addEventListener('click', nextQ);
-nextQ();
 
 /* ---------- 02 pipeline ---------- */
 const steps = [
