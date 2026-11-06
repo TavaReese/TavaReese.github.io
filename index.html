@@ -162,36 +162,38 @@
       color: var(--muted);
     }
 
-    /* Cobalt splashes: top-left and bottom-right corners of the page */
-    :root { --cobalt: 0, 71, 171; }
+    /* Stained-glass blue splashes: top-right corner, and a larger one bottom-left */
+    :root { --blue: 46, 55, 254; --blue-light: 120, 128, 255; --blue-deep: 26, 32, 180; }
     body::before, body::after {
       content: "";
       position: absolute;
-      width: min(680px, 90vw);
-      height: min(680px, 90vw);
       pointer-events: none;
       z-index: -1;
       filter: blur(28px);
       animation: splash 18s ease-in-out infinite alternate;
     }
     body::before {
-      top: 0; left: 0;
-      transform-origin: top left;
+      top: 0; right: 0;
+      width: min(620px, 85vw);
+      height: min(620px, 85vw);
+      transform-origin: top right;
       background:
-        radial-gradient(ellipse 46% 38% at 14% 16%, rgba(var(--cobalt), .62), transparent 70%),
-        radial-gradient(circle at 34% 6%, rgba(28, 92, 222, .42), transparent 34%),
-        radial-gradient(ellipse 30% 44% at 4% 40%, rgba(0, 46, 128, .40), transparent 72%),
-        radial-gradient(circle at 26% 30%, rgba(90, 140, 255, .22), transparent 30%);
+        radial-gradient(ellipse 46% 38% at 86% 16%, rgba(var(--blue), .92), transparent 70%),
+        radial-gradient(circle at 66% 6%, rgba(var(--blue-light), .45), transparent 34%),
+        radial-gradient(ellipse 30% 44% at 96% 40%, rgba(var(--blue-deep), .55), transparent 72%),
+        radial-gradient(circle at 74% 30%, rgba(var(--blue-light), .22), transparent 30%);
     }
     body::after {
-      bottom: 0; right: 0;
-      transform-origin: bottom right;
+      bottom: 0; left: 0;
+      width: min(940px, 100vw);
+      height: min(940px, 100vw);
+      transform-origin: bottom left;
       animation-delay: -9s;
       background:
-        radial-gradient(ellipse 46% 38% at 86% 84%, rgba(var(--cobalt), .62), transparent 70%),
-        radial-gradient(circle at 66% 94%, rgba(28, 92, 222, .42), transparent 34%),
-        radial-gradient(ellipse 30% 44% at 96% 60%, rgba(0, 46, 128, .40), transparent 72%),
-        radial-gradient(circle at 74% 70%, rgba(90, 140, 255, .22), transparent 30%);
+        radial-gradient(ellipse 48% 40% at 16% 84%, rgba(var(--blue), .95), transparent 70%),
+        radial-gradient(circle at 36% 94%, rgba(var(--blue-light), .45), transparent 34%),
+        radial-gradient(ellipse 32% 46% at 5% 58%, rgba(var(--blue-deep), .58), transparent 72%),
+        radial-gradient(circle at 28% 68%, rgba(var(--blue-light), .24), transparent 30%);
     }
     @keyframes splash {
       0%   { transform: scale(1); border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%; }
