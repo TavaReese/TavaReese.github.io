@@ -6,24 +6,24 @@
   <title>Two Kinds of Freedom · Tava Reese</title>
   <meta name="description" content="A corpus and BERT-embedding study of how British MPs use the word freedom, tested against Isaiah Berlin's Two Concepts of Liberty." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #eeeeee; --panel: #e6e6e3; --text: #1a1a18; --muted: #6b6b60;
-      --accent: #b05c3a; --line: #d8d7d2;
+      --bg: #dce7e3; --panel: #d0dcd8; --text: #1a1a18; --muted: #6b6b60;
+      --accent: #b05c3a; --line: #bccbc6;
       --to: #3d6e8c; --from: #b05c3a;
       --left: #b4473d; --centre: #d1993a; --right: #3b5a85; --other: #9a9a8e;
-      --mono: 'DM Mono', ui-monospace, monospace;
+      --mono: 'Courier Prime', 'Courier New', monospace; --display: 'DM Serif Display', 'Times New Roman', serif;
     }
     html { scroll-behavior: smooth; }
-    body { font-family: 'Gowun Batang', Georgia, serif; background: var(--bg); color: var(--text); font-size: 19px; line-height: 1.7; }
+    body { font-family: 'Courier Prime', 'Courier New', monospace; background: var(--bg); color: var(--text); font-size: 16.5px; line-height: 1.65; }
     .container { max-width: 720px; margin: 0 auto; padding: 48px 20px 96px; }
     .wide { max-width: 920px; margin-left: auto; margin-right: auto; }
     a { color: var(--accent); }
     .back { font-family: var(--mono); font-size: 13px; text-decoration: none; }
     .kicker { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 40px 0 10px; }
-    h1 { font-size: 2.4rem; font-weight: 500; line-height: 1.15; letter-spacing: -.02em; margin-bottom: 14px; }
+    h1 { font-family: var(--display); font-size: 2.9rem; font-weight: 400; line-height: 1.08; letter-spacing: -.01em; margin-bottom: 14px; }
     .byline { color: var(--muted); font-style: italic; margin-bottom: 6px; }
     .meta { font-family: var(--mono); font-size: 12px; color: var(--accent); }
     .meta a { margin-right: 14px; text-decoration: none; }
@@ -41,8 +41,8 @@
 
     /* sections */
     section { margin-top: 64px; }
-    h2 { font-size: 1.6rem; font-weight: 500; letter-spacing: -.01em; margin-bottom: 14px; display: flex; gap: 14px; align-items: baseline; }
-    h2 .num { font-family: var(--mono); font-size: .8rem; color: var(--accent); }
+    h2 { font-family: var(--display); font-size: 1.9rem; font-weight: 400; letter-spacing: -.01em; margin-bottom: 14px; display: flex; gap: 14px; align-items: baseline; }
+    h2 .num { font-family: var(--mono); font-size: .85rem; font-weight: 700; color: var(--accent); }
     section p { margin-bottom: 14px; }
     .note { font-size: .92rem; color: var(--muted); }
     blockquote { border-left: 2px solid var(--accent); padding: 2px 0 2px 18px; margin: 18px 0; font-style: italic; }
@@ -70,7 +70,7 @@
     .step::after { content: ''; position: absolute; right: -6px; top: 50%; width: 6px; height: 1px; background: var(--line); }
     .step:last-child::after { display: none; }
     .stepdetail { margin-top: 14px; min-height: 8.5em; }
-    .stepdetail h3 { font-size: 1.1rem; font-weight: 500; margin-bottom: 4px; }
+    .stepdetail h3 { font-family: var(--display); font-size: 1.3rem; font-weight: 400; margin-bottom: 4px; }
     .stepdetail .tool { font-family: var(--mono); font-size: 11.5px; color: var(--accent); margin-bottom: 8px; display: block; }
     .stepdetail p { font-size: .98rem; margin: 0; }
     .flow { height: 4px; margin-top: 10px; background: var(--line); border-radius: 2px; overflow: hidden; }
@@ -144,8 +144,8 @@
     @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } html { scroll-behavior: auto; } }
 
     @media (max-width: 700px) {
-      body { font-size: 18px; }
-      h1 { font-size: 1.9rem; }
+      body { font-size: 16px; }
+      h1 { font-size: 2.1rem; }
       .cards { grid-template-columns: 1fr; }
       .pipe { grid-template-columns: repeat(4, 1fr); }
       .step::after { display: none; }
@@ -574,8 +574,8 @@ drawParty();
   const svg = $('#yearchart'), yrs = Object.keys(D.year).map(Number);
   const X = y => 40 + (y - yrs[0]) / (yrs[yrs.length - 1] - yrs[0]) * 260, Y = v => 200 - (v - .2) / .6 * 180;
   let g = '';
-  [.2, .4, .5, .6, .8].forEach(v => g += `<line x1="40" x2="300" y1="${Y(v)}" y2="${Y(v)}" stroke="${css('--line')}" ${v === .5 ? 'stroke-dasharray="3 3"' : ''}/>` + (v === .5 ? '' : `<text x="34" y="${Y(v) + 4}" text-anchor="end" font-family="DM Mono" font-size="10" fill="${css('--muted')}">${v * 100}%</text>`));
-  yrs.forEach(y => g += `<text x="${X(y)}" y="222" text-anchor="middle" font-family="DM Mono" font-size="10" fill="${css('--muted')}">${y}</text>`);
+  [.2, .4, .5, .6, .8].forEach(v => g += `<line x1="40" x2="300" y1="${Y(v)}" y2="${Y(v)}" stroke="${css('--line')}" ${v === .5 ? 'stroke-dasharray="3 3"' : ''}/>` + (v === .5 ? '' : `<text x="34" y="${Y(v) + 4}" text-anchor="end" font-family="Courier Prime" font-size="10" fill="${css('--muted')}">${v * 100}%</text>`));
+  yrs.forEach(y => g += `<text x="${X(y)}" y="222" text-anchor="middle" font-family="Courier Prime" font-size="10" fill="${css('--muted')}">${y}</text>`);
   const fit = arr => { const n = arr.length, mx = arr.reduce((s, a) => s + a[0], 0) / n, my = arr.reduce((s, a) => s + a[1], 0) / n;
     const b = arr.reduce((s, a) => s + (a[0] - mx) * (a[1] - my), 0) / arr.reduce((s, a) => s + (a[0] - mx) ** 2, 0); return x => my + b * (x - mx); };
   [['to', css('--to'), v => v], ['from', css('--from'), v => 1 - v]].forEach(([k, col, f]) => {
