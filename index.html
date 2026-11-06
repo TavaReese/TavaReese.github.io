@@ -187,12 +187,25 @@
       bottom: 0; left: 0;
       width: min(940px, 100vw);
       height: min(940px, 100vw);
-      transform-origin: 22% 74%;
+      --s: 1;            /* overall size; shrunk on phones */
+      --cx: calc(var(--s) * 180px);                 /* circle center from left */
+      --cy: calc(100% - var(--s) * 230px);          /* circle center from top */
+      --r:  calc(var(--s) * 150px);                 /* circle radius */
+      transform-origin: var(--cx) var(--cy);
+      filter: blur(14px);
       animation: splash-round 14s ease-in-out infinite alternate;
       background:
-        radial-gradient(circle at 18% 69%, rgba(var(--blue-light), .40), transparent 12%),
-        radial-gradient(circle at 25% 77%, rgba(var(--blue-deep), .45), transparent 24%),
-        radial-gradient(circle at 22% 74%, rgba(var(--blue), .95) 0, rgba(var(--blue), .9) 15%, rgba(var(--blue), .3) 25%, transparent 31%);
+        /* glassy highlight and shadow */
+        radial-gradient(circle calc(var(--s) * 60px) at calc(var(--cx) - var(--s) * 40px) calc(var(--cy) - var(--s) * 45px), rgba(var(--blue-light), .45), transparent),
+        radial-gradient(circle calc(var(--s) * 110px) at calc(var(--cx) + var(--s) * 30px) calc(var(--cy) + var(--s) * 35px), rgba(var(--blue-deep), .45), transparent),
+        /* small bump at about 2 o'clock */
+        radial-gradient(circle calc(var(--s) * 40px) at calc(var(--cx) + var(--s) * 132px) calc(var(--cy) - var(--s) * 76px), rgba(var(--blue), .94) 0, rgba(var(--blue), .9) 70%, transparent),
+        /* lumpy, malformed bump at about 10 o'clock */
+        radial-gradient(ellipse calc(var(--s) * 66px) calc(var(--s) * 46px) at calc(var(--cx) - var(--s) * 128px) calc(var(--cy) - var(--s) * 80px), rgba(var(--blue), .94) 0, rgba(var(--blue), .9) 68%, transparent),
+        radial-gradient(ellipse calc(var(--s) * 34px) calc(var(--s) * 54px) at calc(var(--cx) - var(--s) * 92px) calc(var(--cy) - var(--s) * 118px), rgba(var(--blue), .92) 0, rgba(var(--blue), .86) 62%, transparent),
+        radial-gradient(ellipse calc(var(--s) * 38px) calc(var(--s) * 24px) at calc(var(--cx) - var(--s) * 160px) calc(var(--cy) - var(--s) * 112px), rgba(var(--blue-deep), .8) 0, rgba(var(--blue), .7) 55%, transparent),
+        /* the round body */
+        radial-gradient(circle var(--r) at var(--cx) var(--cy), rgba(var(--blue), .95) 0, rgba(var(--blue), .93) 86%, rgba(var(--blue), .5) 95%, transparent);
     }
     @keyframes splash-round {
       0%   { transform: scale(1); }
@@ -204,7 +217,8 @@
       100% { transform: scale(.97); border-radius: 46% 54% 52% 48% / 38% 60% 40% 62%; }
     }
     @media (prefers-reduced-motion: reduce) { body::before, body::after { animation: none; } }
-    @media (max-width: 500px) { body::before, body::after { opacity: .5; } }
+    @media (max-width: 500px) { body::before, body::after { opacity: .5; } body::after { --s: .55; } }
+    @media (min-width: 1400px) { body::after { --s: 1.15; } }
 
     @media (max-width: 500px) {
       .header { flex-direction: column; gap: 20px; }
