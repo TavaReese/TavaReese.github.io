@@ -5,24 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tava Reese</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
       --bg: #eeeeee;
       --text: #1a1a18;
-      --muted: #6b6b60;
-      --accent: #b05c3a;
+      --muted: #4f4b44;
+      --accent: #7a3414;
       --line: #d8d7d2;
     }
 
     body {
-      font-family: 'Gowun Batang', Georgia, serif;
+      font-family: 'Courier Prime', 'Courier New', monospace;
       background: var(--bg);
       color: var(--text);
-      font-size: 19px;
-      line-height: 1.7;
+      font-size: 16.5px;
+      line-height: 1.65;
       min-height: 100vh;
       position: relative;
       z-index: 0;
@@ -64,13 +64,15 @@
       justify-content: center;
       color: var(--muted);
       font-size: 14px;
-      font-family: 'DM Mono', monospace;
+      font-family: 'Courier Prime', 'Courier New', monospace;
     }
 
     .header-text h1 {
-      font-size: 2rem;
-      font-weight: 500;
-      letter-spacing: -0.02em;
+      font-family: 'DM Serif Display', 'Times New Roman', serif;
+      font-size: 2.9rem;
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
       margin-bottom: 4px;
     }
 
@@ -87,7 +89,7 @@
     }
 
     .links a {
-      font-family: 'DM Mono', monospace;
+      font-family: 'Courier Prime', 'Courier New', monospace;
       font-size: 13px;
       color: var(--accent);
       text-decoration: none;
@@ -101,8 +103,9 @@
     section { margin-bottom: 48px; }
 
     section h2 {
-      font-size: 0.75rem;
-      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      font-family: 'Courier Prime', 'Courier New', monospace;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--muted);
@@ -126,7 +129,11 @@
     .paper-list li:first-child { border-top: 1px solid var(--line); }
 
     .paper-title {
-      font-weight: 500;
+      font-family: 'DM Serif Display', 'Times New Roman', serif;
+      font-size: 1.35rem;
+      line-height: 1.25;
+      font-weight: 400;
+      margin-bottom: 4px;
     }
 
     .paper-authors {
@@ -136,7 +143,7 @@
     }
 
     .paper-venue {
-      font-family: 'DM Mono', monospace;
+      font-family: 'Courier Prime', 'Courier New', monospace;
       font-size: 12px;
       color: var(--accent);
       margin-top: 4px;
@@ -144,7 +151,7 @@
 
     .paper-links { margin-top: 6px; }
     .paper-links a {
-      font-family: 'DM Mono', monospace;
+      font-family: 'Courier Prime', 'Courier New', monospace;
       font-size: 12px;
       color: var(--muted);
       text-decoration: none;
@@ -157,68 +164,42 @@
       margin-top: 64px;
       padding-top: 24px;
       border-top: 1px solid var(--line);
-      font-family: 'DM Mono', monospace;
+      font-family: 'Courier Prime', 'Courier New', monospace;
       font-size: 12px;
       color: var(--muted);
     }
 
-    /* Stained-glass blue splashes: top-right corner, and a larger one bottom-left */
-    :root { --blue: 46, 55, 254; --blue-light: 120, 128, 255; --blue-deep: 26, 32, 180; }
+    /* Double-gradient spots: an orange halo with a cobalt core, top-right and bottom-left */
+    :root { --orange: 224, 150, 95; --cobalt: 46, 55, 254; }
     body::before, body::after {
       content: "";
       position: absolute;
+      width: min(1150px, 100vw);
+      height: min(1150px, 100vw);
       pointer-events: none;
       z-index: -1;
-      filter: blur(28px);
-      animation: splash 18s ease-in-out infinite alternate;
+      animation: drift 22s ease-in-out infinite alternate;
     }
     body::before {
       top: 0; right: 0;
-      width: min(620px, 85vw);
-      height: min(620px, 85vw);
-      transform-origin: top right;
+      transform-origin: 80% 15%;
       background:
-        radial-gradient(ellipse 46% 38% at 86% 16%, rgba(var(--blue), .92), transparent 70%),
-        radial-gradient(circle at 66% 6%, rgba(var(--blue-light), .45), transparent 34%),
-        radial-gradient(ellipse 30% 44% at 96% 40%, rgba(var(--blue-deep), .55), transparent 72%),
-        radial-gradient(circle at 74% 30%, rgba(var(--blue-light), .22), transparent 30%);
+        radial-gradient(ellipse 30% 33% at 82% 17%, rgba(var(--cobalt), .96) 0, rgba(var(--cobalt), .9) 38%, rgba(var(--cobalt), 0) 100%),
+        radial-gradient(circle at 60% 26%, rgba(var(--orange), .95) 0, rgba(var(--orange), .9) 26%, rgba(var(--orange), .55) 40%, rgba(var(--orange), 0) 56%);
     }
     body::after {
       bottom: 0; left: 0;
-      width: min(940px, 100vw);
-      height: min(940px, 100vw);
-      --s: 1;            /* overall size; shrunk on phones */
-      --cx: calc(var(--s) * 180px);                 /* circle center from left */
-      --cy: calc(100% - var(--s) * 230px);          /* circle center from top */
-      --r:  calc(var(--s) * 150px);                 /* circle radius */
-      transform-origin: var(--cx) var(--cy);
-      filter: blur(14px);
-      animation: splash-round 14s ease-in-out infinite alternate;
+      transform-origin: 20% 85%;
+      animation-delay: -11s;
       background:
-        /* glassy highlight and shadow */
-        radial-gradient(circle calc(var(--s) * 60px) at calc(var(--cx) - var(--s) * 40px) calc(var(--cy) - var(--s) * 45px), rgba(var(--blue-light), .45), transparent),
-        radial-gradient(circle calc(var(--s) * 110px) at calc(var(--cx) + var(--s) * 30px) calc(var(--cy) + var(--s) * 35px), rgba(var(--blue-deep), .45), transparent),
-        /* small bump at about 2 o'clock */
-        radial-gradient(circle calc(var(--s) * 40px) at calc(var(--cx) + var(--s) * 132px) calc(var(--cy) - var(--s) * 76px), rgba(var(--blue), .94) 0, rgba(var(--blue), .9) 70%, transparent),
-        /* lumpy, malformed bump at about 10 o'clock */
-        radial-gradient(ellipse calc(var(--s) * 66px) calc(var(--s) * 46px) at calc(var(--cx) - var(--s) * 128px) calc(var(--cy) - var(--s) * 80px), rgba(var(--blue), .94) 0, rgba(var(--blue), .9) 68%, transparent),
-        radial-gradient(ellipse calc(var(--s) * 34px) calc(var(--s) * 54px) at calc(var(--cx) - var(--s) * 92px) calc(var(--cy) - var(--s) * 118px), rgba(var(--blue), .92) 0, rgba(var(--blue), .86) 62%, transparent),
-        radial-gradient(ellipse calc(var(--s) * 38px) calc(var(--s) * 24px) at calc(var(--cx) - var(--s) * 160px) calc(var(--cy) - var(--s) * 112px), rgba(var(--blue-deep), .8) 0, rgba(var(--blue), .7) 55%, transparent),
-        /* the round body */
-        radial-gradient(circle var(--r) at var(--cx) var(--cy), rgba(var(--blue), .95) 0, rgba(var(--blue), .93) 86%, rgba(var(--blue), .5) 95%, transparent);
+        radial-gradient(ellipse 30% 33% at 18% 83%, rgba(var(--cobalt), .96) 0, rgba(var(--cobalt), .9) 38%, rgba(var(--cobalt), 0) 100%),
+        radial-gradient(circle at 40% 74%, rgba(var(--orange), .95) 0, rgba(var(--orange), .9) 26%, rgba(var(--orange), .55) 40%, rgba(var(--orange), 0) 56%);
     }
-    @keyframes splash-round {
+    @keyframes drift {
       0%   { transform: scale(1); }
-      100% { transform: scale(.95); }
-    }
-    @keyframes splash {
-      0%   { transform: scale(1); border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%; }
-      50%  { transform: scale(.94); border-radius: 58% 42% 38% 62% / 56% 38% 62% 44%; }
-      100% { transform: scale(.97); border-radius: 46% 54% 52% 48% / 38% 60% 40% 62%; }
+      100% { transform: scale(.96); }
     }
     @media (prefers-reduced-motion: reduce) { body::before, body::after { animation: none; } }
-    @media (max-width: 500px) { body::before, body::after { opacity: .5; } body::after { --s: .55; } }
-    @media (min-width: 1400px) { body::after { --s: 1.15; } }
 
     @media (max-width: 500px) {
       .header { flex-direction: column; gap: 20px; }
