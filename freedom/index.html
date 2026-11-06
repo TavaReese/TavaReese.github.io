@@ -24,10 +24,11 @@
     .container { max-width: 720px; margin: 0 auto; padding: 48px 20px 96px; }
     .wide { max-width: 920px; margin-left: auto; margin-right: auto; }
     a { color: var(--link); }
-    .back { display: inline-block; line-height: 0; border-radius: 6px; transition: transform .2s ease; }
+    .back { position: absolute; top: 28px; left: max(28px, env(safe-area-inset-left, 0px)); z-index: 2; line-height: 0; border-radius: 6px; transition: transform .2s ease; }
     .back img { width: 64px; height: 64px; display: block; }
     .back:hover { transform: translateY(-2px); }
     .back:focus-visible { outline: 2px solid var(--link); outline-offset: 4px; }
+    @media (max-width: 700px) { .back { top: 14px; left: 14px; } .back img { width: 52px; height: 52px; } }
     .kicker { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 40px 0 10px; }
     h1 { font-family: var(--display); font-size: 2.9rem; font-weight: 400; line-height: 1.08; letter-spacing: -.01em; margin-bottom: 14px; }
     .byline { color: var(--muted); font-style: italic; margin-bottom: 6px; }
@@ -164,7 +165,7 @@
     strong, b { font-weight: 500; }
   </style>
 </head>
-<body>
+<body style="position: relative;">
 <div class="container" style="padding-bottom:0">
 
   <a class="back" href="../" aria-label="Back to Tava Reese's homepage" title="Back to homepage"><img src="../tower-button.png" alt="" /></a>
