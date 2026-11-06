@@ -11,7 +11,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg: #dce7e3; --panel: #d0dcd8; --text: #1a1a18; --muted: #6b6b60;
-      --accent: #b05c3a; --link: #0000ee; --line: #bccbc6;
+      --accent: #0000ee; --link: #0000ee; --line: #bccbc6;
       --to: #3d6e8c; --from: #b05c3a;
       --left: #b4473d; --centre: #d1993a; --right: #3b5a85; --other: #9a9a8e;
       --mono: 'Courier Prime', 'Courier New', monospace; --display: 'DM Serif Display', 'Times New Roman', serif;
@@ -22,7 +22,7 @@
     .wide { max-width: 920px; margin-left: auto; margin-right: auto; }
     a { color: var(--link); }
     .back { font-family: var(--mono); font-size: 13px; text-decoration: none; }
-    .kicker { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 40px 0 10px; }
+    .kicker { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 40px 0 10px; }
     h1 { font-family: var(--display); font-size: 2.9rem; font-weight: 400; line-height: 1.08; letter-spacing: -.01em; margin-bottom: 14px; }
     .byline { color: var(--muted); font-style: italic; margin-bottom: 6px; }
     .meta { font-family: var(--mono); font-size: 12px; color: var(--accent); }
@@ -33,7 +33,7 @@
 
     /* TL;DR cards */
     .tldr { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 24px 0; margin: 32px 0 8px; }
-    .label { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; display: block; }
+    .label { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; display: block; }
     .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 18px; }
     .card { background: var(--panel); border-radius: 6px; padding: 14px 14px 12px; }
     .card .big { font-family: var(--mono); font-size: 1.6rem; line-height: 1.1; color: var(--accent); }
