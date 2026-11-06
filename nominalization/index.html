@@ -6,7 +6,7 @@
   <title>A Comparative Analysis of the “X-ing of Y” Construction in Conservative and Progressive Texts · Tava Reese</title>
   <meta name="description" content="A corpus study comparing the 'X-ing of Y' gerund construction and mental spaces in Focus on the Family and Gay and Lesbian Alliance Against Defamation (GLAAD) texts." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -15,10 +15,10 @@
       --actual: #3d6e8c; --virtual: #8a5fb0; --other: #b9b5a8;
       --fotf: #9a7a52; --glaad: #b05c3a;
       --nominal: #3d6e8c; --verbal: #c9952f;
-      --mono: 'Courier Prime', 'Courier New', monospace; --display: 'DM Serif Display', 'Times New Roman', serif;
+      --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace; --display: 'DM Serif Display', 'Times New Roman', serif;
     }
     html { scroll-behavior: smooth; }
-    body { font-family: 'Courier Prime', 'Courier New', monospace; background: var(--bg); color: var(--text); font-size: 16.5px; line-height: 1.65; }
+    body { font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; background: var(--bg); color: var(--text); font-size: 16.5px; line-height: 1.65; }
     .container { max-width: 720px; margin: 0 auto; padding: 48px 20px 0; }
     .container.last { padding-top: 0; padding-bottom: 96px; }
     a { color: var(--link); }
@@ -88,12 +88,12 @@
     #space3d { display: block; width: 100%; height: 520px; cursor: grab; touch-action: pan-y; }
     #space3d.drag { cursor: grabbing; }
     .lbl { position: absolute; left: 0; top: 0; pointer-events: none; font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transform: translate(-50%, -50%); transition: opacity .2s; }
-    .lbl small { display: block; text-transform: none; letter-spacing: 0; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 13px; color: var(--muted); font-style: italic; }
+    .lbl small { display: block; text-transform: none; letter-spacing: 0; font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 13px; color: var(--muted); font-style: italic; }
     .lbl.a { color: var(--actual); } .lbl.v { color: var(--virtual); } .lbl.b { color: var(--text); } .lbl.t { color: var(--muted); font-size: 10px; }
     .hint { position: absolute; right: 12px; bottom: 10px; font-family: var(--mono); font-size: 10.5px; color: var(--muted); pointer-events: none; }
     .views { position: absolute; left: 12px; top: 12px; }
     .exlist { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
-    .exbtn { text-align: left; font-family: 'Courier Prime', 'Courier New', monospace; font-size: .95rem; line-height: 1.35; border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 10px 12px; cursor: pointer; transition: border-color .2s, opacity .2s; }
+    .exbtn { text-align: left; font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: .95rem; line-height: 1.35; border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 10px 12px; cursor: pointer; transition: border-color .2s, opacity .2s; }
     .exbtn:hover { border-color: var(--text); }
     .exbtn .src { display: block; margin-bottom: 3px; }
     .exbtn.done { opacity: .55; }
@@ -140,6 +140,8 @@
       .lbl small { display: none; }
       .slot .w { font-size: 1.15rem; padding: 5px 9px; }
     }
+    body { font-weight: 300; }
+    strong, b { font-weight: 500; }
   </style>
 </head>
 <body>

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tava Reese</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -19,7 +19,7 @@
     }
 
     body {
-      font-family: 'Courier Prime', 'Courier New', monospace;
+      font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
       background: var(--bg);
       color: var(--text);
       font-size: 16.5px;
@@ -65,7 +65,7 @@
       justify-content: center;
       color: var(--muted);
       font-size: 14px;
-      font-family: 'Courier Prime', 'Courier New', monospace;
+      font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
     }
 
     .header-text {
@@ -101,7 +101,7 @@
     a { color: var(--link); }
 
     .links a {
-      font-family: 'Courier Prime', 'Courier New', monospace;
+      font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
       font-size: 13px;
       color: var(--link);
       text-decoration: none;
@@ -115,13 +115,13 @@
     section { margin-bottom: 48px; }
 
     section h2 {
-      font-size: 0.8rem;
-      font-weight: 700;
-      font-family: 'Courier Prime', 'Courier New', monospace;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
+      font-family: 'DM Serif Display', 'Times New Roman', serif;
+      font-size: 1.75rem;
+      font-weight: 400;
+      line-height: 1.15;
+      letter-spacing: 0;
       color: var(--link);
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     section p {
@@ -155,7 +155,7 @@
     }
 
     .paper-venue {
-      font-family: 'Courier Prime', 'Courier New', monospace;
+      font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
       font-size: 12px;
       color: var(--link);
       margin-top: 4px;
@@ -163,7 +163,7 @@
 
     .paper-links { margin-top: 6px; }
     .paper-links a {
-      font-family: 'Courier Prime', 'Courier New', monospace;
+      font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
       font-size: 12px;
       color: var(--muted);
       text-decoration: none;
@@ -176,7 +176,7 @@
       margin-top: 64px;
       padding-top: 24px;
       border-top: 1px solid var(--line);
-      font-family: 'Courier Prime', 'Courier New', monospace;
+      font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
       font-size: 12px;
       color: var(--muted);
     }
@@ -192,6 +192,8 @@
     @media (max-width: 700px) {
       .container { padding-top: 170px; padding-bottom: 170px; }
     }
+    body { font-weight: 300; }
+    strong, b { font-weight: 500; }
   </style>
 </head>
 <body>

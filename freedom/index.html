@@ -6,7 +6,7 @@
   <title>Two Kinds of Freedom · Tava Reese</title>
   <meta name="description" content="A corpus and BERT-embedding study of how British MPs use the word freedom, tested against Isaiah Berlin's Two Concepts of Liberty." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -14,10 +14,10 @@
       --accent: #0000ee; --link: #0000ee; --line: #bccbc6;
       --to: #3d6e8c; --from: #b05c3a;
       --left: #b4473d; --centre: #d1993a; --right: #3b5a85; --other: #9a9a8e;
-      --mono: 'Courier Prime', 'Courier New', monospace; --display: 'DM Serif Display', 'Times New Roman', serif;
+      --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace; --display: 'DM Serif Display', 'Times New Roman', serif;
     }
     html { scroll-behavior: smooth; }
-    body { font-family: 'Courier Prime', 'Courier New', monospace; background: var(--bg); color: var(--text); font-size: 16.5px; line-height: 1.65; }
+    body { font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; background: var(--bg); color: var(--text); font-size: 16.5px; line-height: 1.65; }
     .container { max-width: 720px; margin: 0 auto; padding: 48px 20px 96px; }
     .wide { max-width: 920px; margin-left: auto; margin-right: auto; }
     a { color: var(--link); }
@@ -154,6 +154,8 @@
       #map { height: 420px; }
       .search { width: 100%; }
     }
+    body { font-weight: 300; }
+    strong, b { font-weight: 500; }
   </style>
 </head>
 <body>
@@ -574,8 +576,8 @@ drawParty();
   const svg = $('#yearchart'), yrs = Object.keys(D.year).map(Number);
   const X = y => 40 + (y - yrs[0]) / (yrs[yrs.length - 1] - yrs[0]) * 260, Y = v => 200 - (v - .2) / .6 * 180;
   let g = '';
-  [.2, .4, .5, .6, .8].forEach(v => g += `<line x1="40" x2="300" y1="${Y(v)}" y2="${Y(v)}" stroke="${css('--line')}" ${v === .5 ? 'stroke-dasharray="3 3"' : ''}/>` + (v === .5 ? '' : `<text x="34" y="${Y(v) + 4}" text-anchor="end" font-family="Courier Prime" font-size="10" fill="${css('--muted')}">${v * 100}%</text>`));
-  yrs.forEach(y => g += `<text x="${X(y)}" y="222" text-anchor="middle" font-family="Courier Prime" font-size="10" fill="${css('--muted')}">${y}</text>`);
+  [.2, .4, .5, .6, .8].forEach(v => g += `<line x1="40" x2="300" y1="${Y(v)}" y2="${Y(v)}" stroke="${css('--line')}" ${v === .5 ? 'stroke-dasharray="3 3"' : ''}/>` + (v === .5 ? '' : `<text x="34" y="${Y(v) + 4}" text-anchor="end" font-family="IBM Plex Mono" font-size="10" fill="${css('--muted')}">${v * 100}%</text>`));
+  yrs.forEach(y => g += `<text x="${X(y)}" y="222" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="${css('--muted')}">${y}</text>`);
   const fit = arr => { const n = arr.length, mx = arr.reduce((s, a) => s + a[0], 0) / n, my = arr.reduce((s, a) => s + a[1], 0) / n;
     const b = arr.reduce((s, a) => s + (a[0] - mx) * (a[1] - my), 0) / arr.reduce((s, a) => s + (a[0] - mx) ** 2, 0); return x => my + b * (x - mx); };
   [['to', css('--to'), v => v], ['from', css('--from'), v => 1 - v]].forEach(([k, col, f]) => {
