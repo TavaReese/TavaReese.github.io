@@ -187,13 +187,16 @@
       bottom: 0; left: 0;
       width: min(940px, 100vw);
       height: min(940px, 100vw);
-      transform-origin: bottom left;
-      animation-delay: -9s;
+      transform-origin: 22% 74%;
+      animation: splash-round 14s ease-in-out infinite alternate;
       background:
-        radial-gradient(ellipse 48% 40% at 16% 84%, rgba(var(--blue), .95), transparent 70%),
-        radial-gradient(circle at 36% 94%, rgba(var(--blue-light), .45), transparent 34%),
-        radial-gradient(ellipse 32% 46% at 5% 58%, rgba(var(--blue-deep), .58), transparent 72%),
-        radial-gradient(circle at 28% 68%, rgba(var(--blue-light), .24), transparent 30%);
+        radial-gradient(circle at 18% 69%, rgba(var(--blue-light), .40), transparent 12%),
+        radial-gradient(circle at 25% 77%, rgba(var(--blue-deep), .45), transparent 24%),
+        radial-gradient(circle at 22% 74%, rgba(var(--blue), .95) 0, rgba(var(--blue), .9) 15%, rgba(var(--blue), .3) 25%, transparent 31%);
+    }
+    @keyframes splash-round {
+      0%   { transform: scale(1); }
+      100% { transform: scale(.95); }
     }
     @keyframes splash {
       0%   { transform: scale(1); border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%; }
@@ -201,7 +204,7 @@
       100% { transform: scale(.97); border-radius: 46% 54% 52% 48% / 38% 60% 40% 62%; }
     }
     @media (prefers-reduced-motion: reduce) { body::before, body::after { animation: none; } }
-    @media (max-width: 500px) { body::before, body::after { opacity: .7; } }
+    @media (max-width: 500px) { body::before, body::after { opacity: .5; } }
 
     @media (max-width: 500px) {
       .header { flex-direction: column; gap: 20px; }
