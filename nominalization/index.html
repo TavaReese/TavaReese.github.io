@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>A Comparative Analysis of the “X-ing of Y” Construction in Conservative and Progressive Texts · Tava Reese</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64.png" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
   <meta name="description" content="A corpus study comparing the 'X-ing of Y' gerund construction and mental spaces in Focus on the Family and Gay and Lesbian Alliance Against Defamation (GLAAD) texts." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
@@ -22,7 +25,10 @@
     .container { max-width: 720px; margin: 0 auto; padding: 48px 20px 0; }
     .container.last { padding-top: 0; padding-bottom: 96px; }
     a { color: var(--link); }
-    .back { font-family: var(--mono); font-size: 13px; text-decoration: none; }
+    .back { display: inline-block; line-height: 0; border-radius: 6px; transition: transform .2s ease; }
+    .back img { width: 64px; height: 64px; display: block; }
+    .back:hover { transform: translateY(-2px); }
+    .back:focus-visible { outline: 2px solid var(--link); outline-offset: 4px; }
     .kicker { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 40px 0 10px; }
     h1 { font-family: var(--display); font-size: 2.9rem; font-weight: 400; line-height: 1.08; letter-spacing: -.01em; margin-bottom: 14px; }
     .byline { color: var(--muted); font-style: italic; margin-bottom: 6px; }
@@ -146,7 +152,7 @@
 </head>
 <body>
 <div class="container">
-  <a class="back" href="../">← Tava Reese</a>
+  <a class="back" href="../" aria-label="Back to Tava Reese's homepage" title="Back to homepage"><img src="../tower-button.png" alt="" /></a>
   <div class="kicker">Term paper</div>
   <h1>A Comparative Analysis of the &ldquo;X-ing of Y&rdquo; Construction in Conservative and Progressive Texts</h1>
   <p class="byline"><strong>Tava Reese</strong> · Department of Linguistics, CU Boulder</p>
