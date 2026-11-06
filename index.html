@@ -44,13 +44,30 @@
       border-bottom: 1px solid var(--line);
     }
 
+    /* Photo: 15% larger, sharp in the middle and melting into a blur at the edges */
     .photo {
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      object-fit: cover;
+      position: relative;
+      width: 230px;
+      height: 230px;
       flex-shrink: 0;
-      border: 3px solid var(--line);
+    }
+    .photo img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .photo .soft {
+      filter: blur(14px);
+      transform: scale(1.08);
+      -webkit-mask-image: radial-gradient(circle closest-side, #000 50%, transparent 100%);
+              mask-image: radial-gradient(circle closest-side, #000 50%, transparent 100%);
+    }
+    .photo .sharp {
+      -webkit-mask-image: radial-gradient(circle closest-side, #000 52%, transparent 88%);
+              mask-image: radial-gradient(circle closest-side, #000 52%, transparent 88%);
     }
 
     .photo-placeholder {
@@ -185,7 +202,10 @@
 
     <!-- HEADER -->
     <div class="header">
-      <img class="photo" src="photo.jpg" alt="Tava Reese" />
+      <div class="photo">
+        <img class="soft" src="photo.jpg" alt="" aria-hidden="true" />
+        <img class="sharp" src="photo.jpg" alt="Tava Reese" />
+      </div>
       <div class="header-text">
         <h1>Tava Reese</h1>
         <p class="role">MA Student · Department of Linguistics · University of Colorado, Boulder</p>
