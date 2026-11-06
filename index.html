@@ -38,7 +38,7 @@
     /* Header */
     .header {
       display: flex;
-      gap: 40px;
+      gap: 28px;
       align-items: flex-start;
       margin-bottom: 48px;
       padding-bottom: 48px;
@@ -46,8 +46,8 @@
     }
 
     .photo {
-      width: 200px;
-      height: 200px;
+      width: 260px;
+      height: 260px;
       border-radius: 50%;
       object-fit: cover;
       flex-shrink: 0;
@@ -74,6 +74,8 @@
       text-align: right;
     }
     .header-text .links { justify-content: flex-end; }
+    .header-text .nowrap { white-space: nowrap; }
+    @media (max-width: 760px) { .header-text .nowrap { white-space: normal; } }
 
     .header-text h1 {
       font-family: 'DM Serif Display', 'Times New Roman', serif;
@@ -200,7 +202,7 @@
       <img class="photo" src="photo.jpg" alt="Tava Reese" />
       <div class="header-text">
         <h1>Tava Reese</h1>
-        <p class="role">MA Student · Department of Linguistics · University of Colorado, Boulder</p>
+        <p class="role"><span class="nowrap">MA Student · Department of Linguistics</span><br />University of Colorado, Boulder</p>
         <div class="links">
           <a href="mailto:tava.reese@colorado.edu">email</a>
           <a href="https://github.com/TavaReese" target="_blank">github</a>
