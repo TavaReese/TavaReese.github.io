@@ -9,6 +9,7 @@
   <link rel="apple-touch-icon" href="../tower-sketch-touch.png" />
   <meta name="description" content="A corpus study comparing the 'X-ing of Y' gerund construction and mental spaces in Focus on the Family and Gay and Lesbian Alliance Against Defamation (GLAAD) texts." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -315,7 +316,6 @@
   <footer>Built with plain HTML and three.js · <a href="../" style="text-decoration:none">tavareese.github.io</a></footer>
 </div>
 
-<script src="three.min.js"></script>
 <script>
 (() => {
 /* Figure 1 of the paper: percentage of the 100 sampled "X-ing of Y" tokens per corpus.
@@ -325,6 +325,20 @@ const RESULTS = {
   GLAAD: { actual: 33, virtual: 36, na: 32 }
 };
 
+// Load a heavy script only when it's needed: on a normal connection, quietly right after the page finishes
+// loading; on a slow or data-saver connection, only once the reader scrolls near the part that uses it.
+function lazyScript(src, near, done) {
+  let started = false;
+  const go = () => {
+    if (started) return; started = true; io.disconnect();
+    const s = document.createElement('script'); s.src = src; s.onload = s.onerror = done; document.body.appendChild(s);
+  };
+  const io = new IntersectionObserver(es => es.some(e => e.isIntersecting) && go(), { rootMargin: '1500px 0px' });
+  io.observe(near);
+  const c = navigator.connection, slow = c && (c.saveData || /2g|3g/.test(c.effectiveType || ''));
+  if (!slow) { const idle = () => (window.requestIdleCallback || setTimeout)(go); document.readyState === 'complete' ? idle() : addEventListener('load', idle, { once: true }); }
+  return go;
+}
 const $ = s => document.querySelector(s);
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -556,7 +570,7 @@ EXAMPLES.forEach((ex, i) => {
   });
   exlist.appendChild(b);
 });
-init3D();
+lazyScript('three.min.js', stage, init3D);   // three.js is 650 KB, so it waits until it's needed
 
 /* ---------- 05 corpora ---------- */
 const ROWS = [

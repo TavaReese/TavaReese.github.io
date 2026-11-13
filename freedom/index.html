@@ -9,6 +9,7 @@
   <link rel="apple-touch-icon" href="../tower-sketch-touch.png" />
   <meta name="description" content="A corpus and BERT-embedding study of how British MPs use the word freedom, tested against Isaiah Berlin's Two Concepts of Liberty." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -358,6 +359,20 @@
 <script>
 (() => {
 const D = window.FREEDOM;
+// Load a heavy script only when it's needed: on a normal connection, quietly right after the page finishes
+// loading; on a slow or data-saver connection, only once the reader scrolls near the part that uses it.
+function lazyScript(src, near, done) {
+  let started = false;
+  const go = () => {
+    if (started) return; started = true; io.disconnect();
+    const s = document.createElement('script'); s.src = src; s.onload = s.onerror = done; document.body.appendChild(s);
+  };
+  const io = new IntersectionObserver(es => es.some(e => e.isIntersecting) && go(), { rootMargin: '1500px 0px' });
+  io.observe(near);
+  const c = navigator.connection, slow = c && (c.saveData || /2g|3g/.test(c.effectiveType || ''));
+  if (!slow) { const idle = () => (window.requestIdleCallback || setTimeout)(go); document.readyState === 'complete' ? idle() : addEventListener('load', idle, { once: true }); }
+  return go;
+}
 const $ = s => document.querySelector(s);
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const markF = s => esc(s).replace(/\b(freedoms?)\b/gi, '<mark>$1</mark>');
@@ -460,12 +475,19 @@ const THEMES = {
 };
 const PHRASE = { t: ['freedom to', css('--to')], f: ['freedom from', css('--from')], o: ['other uses', '#d6d2c6'] };
 const PARTY = { L: ['Left', css('--left')], C: ['Centre', css('--centre')], R: ['Right', css('--right')], O: ['Other', css('--other')] };
-const pts = D.pts.map(p => ({ x: p[0], y: p[1], c: p[2], th: p[3], ph: p[4], pa: p[5], t: p[6], lt: p[6].toLowerCase() }));
-const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
-const ext = { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
+// The 2,266 points live in points.js (half a megabyte), which loads separately so the rest of the page works first.
+let pts = [], ext = { x0: 0, x1: 1, y0: 0, y1: 1 }, mapInView = false, afterLoad = null;
+function setPoints(raw) {
+  pts = raw.map(p => ({ x: p[0], y: p[1], c: p[2], th: p[3], ph: p[4], pa: p[5], t: p[6], lt: p[6].toLowerCase() }));
+  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+  ext = { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
+  pts.forEach(p => { p.sx = Math.random(); p.sy = Math.random(); });
+  buildLegend();
+  if (mapInView) intro();
+  if (afterLoad) { afterLoad(); afterLoad = null; }
+}
 const canvas = $('#map'), ctx = canvas.getContext('2d'), tip = $('#tip');
 let mode = 'theme', query = '', hidden = new Set(), hover = null, pinned = null, focusCluster = null, W = 0, H = 0, anim = reduce ? 1 : 0, started = false;
-pts.forEach(p => { p.sx = Math.random(); p.sy = Math.random(); });
 const keyOf = p => mode === 'theme' ? p.th : mode === 'phrase' ? p.ph : p.pa;
 const colorOf = p => mode === 'theme' ? THEMES[p.th][1] : mode === 'phrase' ? PHRASE[p.ph][1] : PARTY[p.pa][1];
 const match = p => (!query || p.lt.includes(query)) && !hidden.has(keyOf(p)) && (focusCluster === null || p.c === focusCluster);
@@ -494,16 +516,17 @@ function draw() {
   for (const p of [hover, pinned]) if (p) {
     ctx.strokeStyle = '#1a1a18'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(p.px, p.py, r + 4, 0, 6.29); ctx.stroke();
   }
+  if (!pts.length) { $('#count').textContent = 'loading points…'; return; }
   const n = pts.filter(match).length; $('#count').textContent = n === pts.length ? `${n.toLocaleString()} points` : `${n.toLocaleString()} of ${pts.length.toLocaleString()}`;
 }
 function intro() {
-  if (started) return; started = true;
+  if (started || !pts.length) return; started = true;
   if (reduce) { anim = 1; draw(); return; }
   const t0 = performance.now();
   const step = t => { anim = Math.min(1, (t - t0) / 1400); draw(); if (anim < 1) requestAnimationFrame(step); };
   requestAnimationFrame(step);
 }
-new IntersectionObserver(es => es.forEach(e => e.isIntersecting && intro()), { threshold: .3 }).observe(canvas);
+new IntersectionObserver(es => es.forEach(e => { mapInView = e.isIntersecting; if (mapInView) intro(); }), { threshold: .3 }).observe(canvas);
 function nearest(mx, my) {
   let best = null, bd = 196;
   for (const p of pts) { if (!match(p)) continue; const d = (p.px - mx) ** 2 + (p.py - my) ** 2; if (d < bd) { bd = d; best = p; } }
@@ -539,7 +562,8 @@ function pin(p, intro) {
   $('#reader').innerHTML = html;
   const iso = $('#isolate'); if (iso) iso.onclick = () => { focusCluster = focusCluster === p.c ? null : p.c; pin(p); };
 }
-document.querySelectorAll('[data-tour]').forEach(b => b.addEventListener('click', () => {
+document.querySelectorAll('[data-tour]').forEach(b => b.addEventListener('click', function tour() {
+  if (!pts.length) { afterLoad = tour; loadPoints(); return; }   // clicked before the points arrived: finish once they do
   const c = +b.dataset.tour, C = D.clusters[c];
   if (c === 0 || c === 3) { mode = 'phrase'; setSeg($('#mode'), mode); buildLegend(); }
   else { mode = 'theme'; setSeg($('#mode'), mode); buildLegend(); }
@@ -563,6 +587,9 @@ $('#mode').addEventListener('click', e => { const v = e.target.closest('button')
 $('#search').addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); draw(); });
 addEventListener('resize', resize);
 resize(); buildLegend();
+const loadPoints = lazyScript('points.js', $('#map-section'), () => {
+  if (window.FREEDOM_PTS) setPoints(window.FREEDOM_PTS); else $('#count').textContent = 'points could not load';
+});
 
 /* ---------- 06 results ---------- */
 let pv = 'norm';

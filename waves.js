@@ -96,20 +96,62 @@
   const uView=U('uView'), uDpr=U('uDpr'), uScroll=U('uScroll'), uDocH=U('uDocH'), uTime=U('uTime'),
         uEnergy=U('uEnergy'), uMouse=U('uMouse'), uRip=U('uRip'), uCol=U('uCol');
 
-  let dpr = 1, vw = 0, vh = 0, docH = 0;
+  /* ---- Pacing: draw only as often as the eye can tell, and only as sharply as the machine can afford ----
+     · Idle (no cursor, no scroll): the slow drift is redrawn ~12×/s instead of 60×/s, which looks the same.
+     · Cursor, ripples or scrolling: full frame rate, exactly as before.
+     · Slow graphics: the canvas is drawn at a lower resolution; on very slow machines the waves hold still
+       and redraw only when you scroll, like the reduced-motion version. */
+  const SCALES = [1.5, 1.25, 1, .75, .5].filter(s => s <= Math.max(.5, Math.min(window.devicePixelRatio || 1, 1.5)));
+  let si = 0, dpr = SCALES[0], vw = 0, vh = 0, docH = 0;
   function resize(){
-    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     vw = window.innerWidth; vh = window.innerHeight; docH = document.documentElement.scrollHeight;
     cvs.width = Math.round(vw*dpr); cvs.height = Math.round(vh*dpr);
     gl.viewport(0, 0, cvs.width, cvs.height);
   }
-  addEventListener('resize', resize); resize();
-  new ResizeObserver(() => { docH = document.documentElement.scrollHeight; }).observe(document.body);
+  resize();
 
   const rip = new Float32Array(32); let ri = 0;
   let mx = -9999, my = -9999, lastX = 0, lastY = 0, lastRip = 0, energy = 0, target = 0;
   const t0 = performance.now(); const now = () => (performance.now() - t0)/1000;
+  let frozenT = 0, activeUntil = 0;
+
+  function draw(t){
+    target *= .92; energy += (target - energy)*.15;
+    gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniform2f(uView, vw, vh); gl.uniform1f(uDpr, dpr); gl.uniform1f(uScroll, scrollY);
+    gl.uniform1f(uDocH, docH); gl.uniform1f(uTime, t); gl.uniform1f(uEnergy, energy);
+    gl.uniform2f(uMouse, mx, my); gl.uniform4fv(uRip, rip); gl.uniform1f(uCol, COL);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+
+  // Measure how long one full-screen draw takes here, at the cheapest resolution, then pick the
+  // sharpest resolution that fits in a frame (~12 ms). Reading one pixel waits for the GPU to finish;
+  // the cost of that wait alone is measured too and subtracted, so fast machines aren't underestimated.
+  const px = new Uint8Array(4);
+  const sync = () => gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+  function timeDraw(){ const a = performance.now(); draw(still ? 0 : now()); sync(); return performance.now() - a; }
+  function timeEmpty(){ const a = performance.now(); gl.clear(gl.COLOR_BUFFER_BIT); sync(); return performance.now() - a; }
+  function calibrate(){
+    dpr = SCALES[SCALES.length - 1]; resize();
+    timeDraw();                                  // warm-up (shader compile)
+    const ms = Math.max(0, Math.min(timeDraw(), timeDraw()) - Math.min(timeEmpty(), timeEmpty()));
+    const perPx = ms / (cvs.width*cvs.height);
+    si = SCALES.findIndex(s => perPx * vw*vh*s*s <= 12);
+    const slow = si < 0 && ms > 14;              // too slow to animate smoothly even at the lowest resolution
+    if (si < 0) si = SCALES.length - 1;
+    dpr = SCALES[si]; resize();
+    return slow;
+  }
+  let mode = (calibrate() || still) ? 'still' : 'anim';
+
+  let pending = false;
+  const requestDraw = () => { if (pending) return; pending = true; requestAnimationFrame(() => { pending = false; draw(frozenT); }); };
+  addEventListener('resize', () => { resize(); if (mode === 'still') requestDraw(); });
+  new ResizeObserver(() => { docH = document.documentElement.scrollHeight; if (mode === 'still') requestDraw(); }).observe(document.body);
+  addEventListener('scroll', () => { if (mode === 'still') requestDraw(); else activeUntil = performance.now() + 300; }, { passive: true });
+
   if (!still) addEventListener('pointermove', e => {
+    if (mode !== 'anim') return;
     const x = e.clientX, y = e.clientY + scrollY;
     const sp = Math.hypot(x - lastX, y - lastY);
     mx = x; my = y; target = Math.min(1, target + sp/35);
@@ -117,20 +159,42 @@
     if (sp > 0 && (Math.hypot(x - rip[((ri+7)%8)*4], y - rip[((ri+7)%8)*4+1]) > 55) && t - lastRip > .07) {
       rip.set([x, y, t, Math.min(1, .35 + sp/40)], ri*4); ri = (ri+1) % 8; lastRip = t;
     }
-    lastX = x; lastY = y;
+    lastX = x; lastY = y; activeUntil = performance.now() + 150;
   }, { passive: true });
 
-  function frame(){
-    const t = still ? 0 : now();
-    target *= .92; energy += (target - energy)*.15;
-    gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.uniform2f(uView, vw, vh); gl.uniform1f(uDpr, dpr); gl.uniform1f(uScroll, scrollY);
-    gl.uniform1f(uDocH, docH); gl.uniform1f(uTime, t); gl.uniform1f(uEnergy, energy);
-    gl.uniform2f(uMouse, mx, my); gl.uniform4fv(uRip, rip); gl.uniform1f(uCol, COL);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    if (!still) requestAnimationFrame(frame);
+  function busy(t){
+    if (energy > .004 || target > .004 || performance.now() < activeUntil) return true;
+    for (let i = 0; i < 8; i++) if (rip[i*4+3] > 0 && t - rip[i*4+2] < 2.6) return true;
+    return false;
   }
-  if (still) { addEventListener('scroll', () => requestAnimationFrame(frame), { passive: true }); addEventListener('resize', () => requestAnimationFrame(frame)); }
-  requestAnimationFrame(frame);
-})();
 
+  // While animating at full speed, watch the real frame rate; if it sags below ~30 fps, step the resolution
+  // down, and if it is already at the lowest, let the waves hold still.
+  let lastDraw = -1e9, prevFast = 0; const gaps = [];
+  function goStill(){ mode = 'still'; cvs.dataset.quality = 'still @' + dpr; frozenT = now(); mx = my = -9999; energy = target = 0; rip.fill(0); requestDraw(); }
+  function loop(ts){
+    if (mode !== 'anim') return;
+    requestAnimationFrame(loop);
+    const t = now(), fast = busy(t);
+    if (!fast && ts - lastDraw < 83) return;      // idle: ~12 fps
+    if (fast && prevFast && ts - prevFast < 250) {
+      gaps.push(ts - prevFast);
+      if (gaps.length >= 24) {
+        const med = gaps.sort((a, b) => a - b)[12]; gaps.length = 0;
+        if (med > 34) { if (si < SCALES.length - 1) { dpr = SCALES[++si]; resize(); cvs.dataset.quality = 'anim @' + dpr; } else return goStill(); }
+      }
+    }
+    prevFast = fast ? ts : 0;
+    draw(t); lastDraw = ts;
+  }
+  cvs.dataset.quality = mode + ' @' + dpr;     // handy for checking in dev tools
+  if (mode === 'anim') requestAnimationFrame(loop);
+  else {
+    requestDraw();
+    // The first check ran while the page was still loading; if it called this machine slow, look again once things settle.
+    if (!still) {
+      const recheck = () => setTimeout(() => { if (!calibrate()) { mode = 'anim'; cvs.dataset.quality = 'anim @' + dpr; requestAnimationFrame(loop); } else requestDraw(); }, 2500);
+      document.readyState === 'complete' ? recheck() : addEventListener('load', recheck, { once: true });
+    }
+  }
+})();
